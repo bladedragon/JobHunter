@@ -1,0 +1,29 @@
+pring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    druid:
+      slave:
+        url: jdbc:mysql://127.0.0.1/prize_data_db?characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+        username:
+        password:
+
+      initialSize: 10
+      minIdle: 10
+      maxActive: 100
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 200   #PreparedStatement缓存大小
+      filters: stat,wall          #stat:web监控   wall：sql防火墙
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      useGlobalDataSourceStat: true
+      test-while-idle: true  #申请连接的时候检测，如果空闲时间大
+
