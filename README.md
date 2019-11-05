@@ -1,2 +1,0 @@
-# JobHunter
-miniapp-backend api 
