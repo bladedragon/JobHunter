@@ -2,6 +2,7 @@ package team.legend.jobhunter.jwt;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import team.legend.jobhunter.utils.SecretUtil;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j
 public class Jwt {
     private Map<String,String> header;
     private Map<String,String> payload;
@@ -44,6 +46,8 @@ public class Jwt {
 
         header.put("alg",algorithm);
         header.put("tye","JWT");
+
+        refreshEffectiveTime(effectiveTime);
     }
 
     public void refreshEffectiveTime(long effectiveTime){
@@ -73,11 +77,11 @@ public class Jwt {
 
     public void initSecret(String key) {
         String text = SecretUtil.encodeBase64(getHeaderJSONStr()) + "." + SecretUtil.encodeBase64(getPayloadJSONStr());
-        signature = SecretUtil.encodeBase64(SecretUtil.encode(header.get("alg"), text, key));
+        signature = SecretUtil.encodeBase64(SecretUtil.jwtEncode(header.get("alg"), text, key));
     }
 
 
-    public String getJwtString(){
+    public  String getJwtString(){
         if(signature != null){
             String headerStr = getHeaderJSONStr();
             String payloadStr = getPayloadJSONStr();
@@ -85,6 +89,23 @@ public class Jwt {
             return  SecretUtil.encodeBase64(jwtStr);
         }
         throw new RuntimeException("signature is not initialized");
+    }
+
+    public static Jwt fromString(String jwtStr) {
+        Jwt jwt = null;
+        if (jwtStr != null) {
+            String jwt_decode = SecretUtil.decodeBase64(jwtStr);
+            String[] str = jwt_decode.split("\\.");
+            try {
+                String header = SecretUtil.decodeBase64(str[0]);
+                String payload = SecretUtil.decodeBase64(str[1]);
+                String secret = str[2];
+                jwt = new Jwt(header, payload, secret);
+            } catch (Throwable e) {
+                log.error(">>JWT转换失败"+jwt_decode);
+            }
+        }
+        return jwt;
     }
 
     public static void main(String[] args) {

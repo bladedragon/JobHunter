@@ -1,4 +1,4 @@
-pring:
+spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://127.0.0.1/miniapp?characterEncoding=utf8mb4&useSSL=false&serverTimezone=UTC
@@ -26,4 +26,25 @@ pring:
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
       useGlobalDataSourceStat: true
       test-while-idle: true  #申请连接的时候检测，如果空闲时间大
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    password:
+    timeout: 500ms
+
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 2
+        max-active: 8
+        max-wait: 10000ms
+
+wxapi:
+  code2Session:
+  appid:
+  appSecret:
+  get_accesstoken:
+server:
+  port: 83
 

@@ -2,20 +2,33 @@ package team.legend.jobhunter.utils;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import sun.security.provider.MD5;
 
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.Base64;
+
+import static io.netty.util.internal.StringUtil.byteToHexString;
 
 @Slf4j
 public class SecretUtil {
 
-    public static byte[] encode(String algorithm,String text,String secret){
+    /**
+     * jwt加密工具
+     * @param algorithm
+     * @param text
+     * @param secret
+     * @return
+     */
+    public static byte[] jwtEncode(String algorithm,String text,String secret){
         Mac mac = null;
         try {
             mac = Mac.getInstance(algorithm);
@@ -28,11 +41,82 @@ public class SecretUtil {
                 byte[]  macBuff = mac.doFinal(text.getBytes());
                 return macBuff;
             }else{
-                log.error("mac is null");
+                log.error("/nmac is null/n");
             }
         }
         return null;
 
+    }
+
+    /**
+     * 用户ID加密工具
+     * @param salt
+     * @param openid
+     * @return
+     */
+    public static String user_idEncode(String salt,String openid){
+        String signature_header = salt+"**"+openid;
+        String signature = "null";
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            signature = byteArrayToHexString(md.digest(signature_header.getBytes()));
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        String encode_id = encodeBase64(signature).substring(0,10)
+                +(String.valueOf(System.currentTimeMillis()).substring(5,10));
+        return encode_id;
+
+    }
+
+    public static String MD5Encode(String str){
+        String encodeStr = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            encodeStr = byteArrayToHexString(md.digest(str.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return encodeStr;
+    }
+
+    /**
+     * 微信敏感数据解密工具
+     * @param sSrc
+     * @param sKey
+     * @param ivs
+     * @return
+     */
+    public static String decrypt(String sSrc, byte[] sKey, byte[] ivs) {
+
+        Security.addProvider(new BouncyCastleProvider());
+        try {
+            SecretKeySpec skeySpec = new SecretKeySpec(sKey, "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+            IvParameterSpec iv = new IvParameterSpec(ivs);
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
+            byte[] original = cipher.doFinal(SecretUtil.decodeBase64ToBtye(sSrc));
+            return new String(original, StandardCharsets.UTF_8);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * 十六进制转换
+     * @param b
+     * @return
+     */
+    private static String byteArrayToHexString(byte b[]) {
+        StringBuffer resultSb = new StringBuffer();
+        for (int i = 0; i < b.length; i++) {
+            resultSb.append(byteToHexString(b[i]));
+        }
+        return resultSb.toString();
     }
 
     public static String encodeBase64(String text) {
@@ -48,6 +132,34 @@ public class SecretUtil {
 
     public static String encodeBase64(byte[] encode) {
         return Base64.getEncoder().encodeToString(encode);
+    }
+
+    public static String shaCheck(String rawData,String signature){
+
+        String encodeStr = rawData+signature;
+
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA");
+            sha.update(encodeStr.getBytes());
+            byte[] shaBin= sha.digest();
+            return new String(shaBin, StandardCharsets.UTF_8);
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+
+    public static void main(String[] args) {
+
+//        byte[] bytes= jwtEncode("HmacSHA256","text","ICT_TEAM");
+//        System.out.println(encodeBase64(bytes));
+        System.out.println(System.currentTimeMillis()/1000);
+        System.out.println(user_idEncode("username","openid"));
+
+
     }
 }
 

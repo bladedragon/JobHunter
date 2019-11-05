@@ -1,6 +1,10 @@
 package team.legend.jobhunter.jwt;
 
+import org.springframework.stereotype.Component;
+import team.legend.jobhunter.utils.SecretUtil;
+
 import java.lang.reflect.Field;
+
 
 public class JwtHelper<T> {
     private String iss;
@@ -56,7 +60,23 @@ public class JwtHelper<T> {
             }
 
         }
+        jwt.initSecret(secretKey);
+
         return jwt;
+    }
+
+    public boolean isAuthorize(Jwt jwt){
+        String headerJson = jwt.getHeaderJSONStr();
+        String playloadJson = jwt.getPayloadJSONStr();
+        String secret = jwt.getSignature();
+
+        String encodeHeader = SecretUtil.encodeBase64(headerJson);
+        String encodePlayload = SecretUtil.encodeBase64(playloadJson);
+        String text = encodeHeader + "." + encodePlayload;
+        String encodeText = SecretUtil.encodeBase64(SecretUtil.jwtEncode(algorithm, secretKey, text));
+
+        return encodeText.equals(secret);
+
     }
 
 }
