@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import team.legend.jobhunter.dao.Resume_serviceDao;
 import team.legend.jobhunter.dao.TeaDao;
+import team.legend.jobhunter.dao.Tutor_serviceDao;
 import team.legend.jobhunter.dao.WXDao;
 import team.legend.jobhunter.exception.SqlErrorException;
 import team.legend.jobhunter.model.DO.TeaDO;
@@ -36,6 +38,11 @@ public class TeaInfoServiceImpl implements TeaInfoService {
     WXDao wxDao;
     @Autowired
     IDGenerator idGenerator;
+
+    @Autowired
+    Resume_serviceDao resumeServiceDao;
+    @Autowired
+    Tutor_serviceDao tutorServiceDao;
 
     @Override
     public String saveImg(String tea_id,MultipartFile headImg) {
@@ -102,11 +109,18 @@ public class TeaInfoServiceImpl implements TeaInfoService {
             if(i!=0){
                 serviceTypes += ".";
             }
+            if(serviceTypeArray.get(i).equals("resume")){
+                teaDao.updateResumeInfo(teaId,nickname,img_url,perDes,offers,company,isOnline,
+                        System.currentTimeMillis()/1000,positon);
+            }
+            if(serviceTypeArray.get(i).equals("tutor")){
+                teaDao.updateTutorInfo(teaId,nickname,img_url,perDes,offers,company,isOnline,
+                        System.currentTimeMillis()/1000,positon);
+            }
             serviceTypes += serviceTypeArray.getString(i);
         }
 
         int num = teaDao.updateTea(new TeaDO(teaId,nickname,teaName,img_url,teles,"",perDes,offers,company,positon,serviceTypes,isOnline));
-
         Teacher teacher = teaDao.selectByTeaId(teaId);
         if(teacher != null){
 
@@ -135,7 +149,6 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         Map<String,Object> teaMap = new HashMap<>(5);
         System.out.println(teaId);
             Teacher teacher = teaDao.selectByTeaId(teaId);
-            //TODO techer 获取为null?
             teaMap.put("teacher",teacher);
             if(teacher == null ){
                 teaMap.put("fail",null);
@@ -143,8 +156,12 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         return  teaMap;
     }
 
-    /*
-        MD5+SHA
+    /**
+     * 验证码验证
+     * @param openid
+     * @param verifyCode
+     * @param userId
+     * @return  MD5+SHA
      */
     @Override
     @Transactional(rollbackFor = SqlErrorException.class)
