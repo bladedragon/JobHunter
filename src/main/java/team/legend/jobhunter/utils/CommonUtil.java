@@ -2,6 +2,7 @@ package team.legend.jobhunter.utils;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -33,9 +34,18 @@ public class CommonUtil {
 
     }
 
+
     public static String getRandomStr(int num){
         return "";
     }
+
+    public static List<String> toStrList(String str){
+        String[] strs = str.split("\\.");
+        List<String> strList = Arrays.asList(strs);
+        return strList;
+    }
+
+
 
     public static void main(String[] args) {
         Map<String,String> map = new HashMap<>();

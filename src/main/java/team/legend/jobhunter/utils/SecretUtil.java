@@ -48,28 +48,7 @@ public class SecretUtil {
 
     }
 
-    /**
-     * 用户ID加密工具
-     * @param salt
-     * @param openid
-     * @return
-     */
-    public static String user_idEncode(String salt,String openid){
-        String signature_header = salt+"**"+openid;
-        String signature = "null";
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            signature = byteArrayToHexString(md.digest(signature_header.getBytes()));
 
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        String encode_id = encodeBase64(signature).substring(0,10)
-                +(String.valueOf(System.currentTimeMillis()).substring(5,10));
-        return encode_id;
-
-    }
 
     public static String MD5Encode(String str){
         String encodeStr = null;
@@ -156,8 +135,8 @@ public class SecretUtil {
 
 //        byte[] bytes= jwtEncode("HmacSHA256","text","ICT_TEAM");
 //        System.out.println(encodeBase64(bytes));
-        System.out.println(System.currentTimeMillis()/1000);
-        System.out.println(user_idEncode("username","openid"));
+//        System.out.println(System.currentTimeMillis()/1000);
+
 
 
     }

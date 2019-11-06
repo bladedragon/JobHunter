@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TimeLogAdvice {
 
-    @Pointcut("execution(public team.legend.jobhunter.controller.*.*(..))")
+    @Pointcut("execution(public * team.legend.jobhunter.controller.*.*(..))")
     public void log(){
     }
 

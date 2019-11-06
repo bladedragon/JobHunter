@@ -13,6 +13,7 @@ import team.legend.jobhunter.model.WXLogin;
 import team.legend.jobhunter.model.WXUser;
 import team.legend.jobhunter.service.UserService;
 import team.legend.jobhunter.utils.HttpUtil;
+import team.legend.jobhunter.utils.IDGenerator;
 import team.legend.jobhunter.utils.SecretUtil;
 
 import java.text.SimpleDateFormat;
@@ -33,6 +34,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtHelper<WXLogin> wxLoginJwtHelper;
+    @Autowired
+    IDGenerator idGenerator;
 
     @Autowired
     WXDao wxDao;
@@ -83,7 +86,8 @@ public class UserServiceImpl implements UserService {
         String date  = simpleDateFormat.format(new Date());
 
         if(sessionMap.containsKey(0)){
-            user_id = SecretUtil.user_idEncode(sessionMap.get(0),sessionMap.get(1));
+            int rank = wxDao.getCount();
+            user_id = idGenerator.user_idEncode(sessionMap.get(0),sessionMap.get(1),rank);
             wxLogin.setOpenid(sessionMap.get(1));
             wxLogin.setSessionkey(sessionMap.get(0));
             if(sessionMap.containsKey(2)){

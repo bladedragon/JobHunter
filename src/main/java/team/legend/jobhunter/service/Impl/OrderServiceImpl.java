@@ -8,11 +8,9 @@ import team.legend.jobhunter.dao.OrderDao;
 import team.legend.jobhunter.dao.TeaDao;
 import team.legend.jobhunter.exception.OrderErrorException;
 import team.legend.jobhunter.model.DO.OrderDo;
-import team.legend.jobhunter.model.DO.TeaDO;
 import team.legend.jobhunter.model.Order;
 import team.legend.jobhunter.model.PreOrder;
 import team.legend.jobhunter.service.OrderService;
-import team.legend.jobhunter.utils.CommonUtil;
 import team.legend.jobhunter.utils.Constant;
 import team.legend.jobhunter.utils.RedisLockHelper;
 
@@ -49,11 +47,11 @@ public class OrderServiceImpl implements OrderService {
                 redisLockHelper.unlock(order_id,lockTimestamp);
                 return res_map;
             }
-            TeaDO teaDO = teaDao.selectByTeaId(preOrder.getTea_id());
-            orderDao.insertOrder(new OrderDo(order_id,teaDO.getTeaId(),teaDO.getNickname(),teaDO.getImg_url(),teaDO.getGender(),
-                    preOrder.getStu_id(),preOrder.getItem_time(),preOrder.getItem_price(),preOrder.getItem_isonline(),
-                    preOrder.getItem_time_detail(),CommonUtil.getNowDate(),preOrder.getOrder_type(),200,CommonUtil.getNowDate(),
-                   null,0));
+//            Teacher teaDO = teaDao.selectByTeaId(preOrder.getTea_id());
+//            orderDao.insertOrder(new OrderDo(order_id,teaDO.getTea_id(),teaDO.getTea_nickname(),teaDO.getTea_img_url(),teaDO.getGender(),
+//                    preOrder.getStu_id(),preOrder.getItem_time(),preOrder.getItem_price(),preOrder.getItem_isonline(),
+//                    preOrder.getItem_time_detail(),CommonUtil.getNowDate(),preOrder.getOrder_type(),200,CommonUtil.getNowDate(),
+//                   null,0));
             itemDao.updateIsordered(preOrder.getItem_id());
                 OrderDo orderDo= orderDao.selectByOrderId(order_id);
                 if(orderDo == null){

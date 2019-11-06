@@ -1,66 +1,115 @@
 package team.legend.jobhunter.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team.legend.jobhunter.exception.SqlErrorException;
+import team.legend.jobhunter.model.Teacher;
+import team.legend.jobhunter.service.TeaInfoService;
+import team.legend.jobhunter.utils.CommonUtil;
 import team.legend.jobhunter.utils.Constant;
-import team.legend.jobhunter.utils.SecretUtil;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 public class TeaController {
+    @Autowired
+    TeaInfoService teaInfoService;
+
 
     @PostMapping(value = "/getTeaHome",produces = "application/json;charset=UTF-8")
-    public String getTeacher(String teaId){
+    public String getTeacher(@RequestBody JSONObject jsonObject){
+        String teaId = jsonObject.getString("teaId");
 
-        return null;
+        if(teaId == null ||teaId.equals("")){
+            return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"cannot get teaID");
+
+        }
+        Map<String,Object> map = teaInfoService.getTeaInfo(teaId);
+        if(map.containsKey("fail")){
+            return CommonUtil.returnFormatSimp(Constant.ERROR_Tea_InfoError,"get teaInfo fail");
+        }
+        Teacher teacher = (Teacher) map.get("teacher");
+
+        return CommonUtil.returnFormat(202,"success",teacher);
     }
 
-    @PostMapping(value = "modifyTeaInfo",produces ="application/json;charset=UTF-8")
-    public String updateInfo(@RequestParam(value = "headImg",required=false) MultipartFile headImg, HttpServletRequest request){
-        ServletInputStream is= null;
-        String str = null;
-        try {
-            is = request.getInputStream();
-            BufferedReader br=new BufferedReader(new InputStreamReader(is));
-            str =br.readLine();
 
-        } catch (IOException e) {
+
+    @PostMapping(value = "/modifyTeaInfo",produces ="application/json;charset=UTF-8")
+    public String updateInfo(@RequestParam(value = "headImg",required=false) MultipartFile headImg, @RequestParam("jsonStr") String jsonStr){
+//        ServletInputStream is= null;
+//        String str = null;
+//        try {
+//            is = request.getInputStream();
+//            BufferedReader br=new BufferedReader(new InputStreamReader(is));
+//            str =br.readLine();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        JSONObject reqMsg = JSONObject.parseObject(jsonStr);
+
+        String teaId = reqMsg.getString("teaId");
+        if(teaId ==null){
+            return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param is error");
+        }
+
+        String imgUrl =teaInfoService.saveImg(teaId,headImg);
+        Map<String,Object>  teaInfo = teaInfoService.modifyInfo(reqMsg,imgUrl);
+
+        if(teaInfo !=null){
+            return CommonUtil.returnFormat(200,"success",teaInfo);
+        }
+        return CommonUtil.returnFormatSimp(Constant.ERROR_Tea_InfoError,"cannot get teaInfo");
+    }
+
+    @PostMapping(value = "/verify",produces = "application/json;charset=UTF-8")
+    public String verifyTea(@RequestBody JSONObject jsonStr) {
+            String openid = jsonStr.getString("openid");
+            String verifyCode = jsonStr.getString("verifyCode");
+            String userId = jsonStr.getString("userId");
+
+        String teaId = null;
+        try {
+            teaId = teaInfoService.verify(openid,verifyCode,userId);
+        } catch (SqlErrorException e) {
             e.printStackTrace();
         }
-        JSONObject reqMsg = JSONObject.parseObject(str);
-
-        if(null != headImg){
-            String originFileName = headImg.getOriginalFilename().toLowerCase();
-            String[] strs = originFileName.split("\\.");
-            String fileSuffix = strs[1] ;
-            String preStr = strs[0];
-            for (String suffix : Constant.ALLOW_SUFFIXS) {
-                if(fileSuffix.equals(suffix)){
-                    SecretUtil.MD5Encode(preStr);
-
+        if(teaId != null){
+                if(teaId.equals("duplication")){
+                    return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_VERIFY_DUPLICATION,"verify duplication");
                 }
+                return CommonUtil.returnFormat(200,"success",teaId);
             }
-        }
-        return null;
+
+            return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_VERIFY_FAIL,"verify fail");
     }
 
-
-
     public static void main(String[] args) {
-        String  s = "asdasd.sds";
-        String[] strs =  s.split("\\.");
-        System.out.println(strs[1]);
+        Map<String,Object> map = new HashMap<>();
+        List<String> offer = new ArrayList<>();
+        List<String> tele = new ArrayList<>();
+        List<String> server = new ArrayList<>();
+        map.put("teaId","123");
+        map.put("teaName","jainhlaosh ");
+        map.put("nickname","jaing");
+        map.put("company","legned");
+        map.put("isOnline",0);
+        map.put("offer",offer);
+        map.put("perDes","asdasd");
+        map.put("tele",tele);
+        map.put("position","asd");
+        map.put("serviceType",server);
+        String str = JSON.toJSONString(map);
+        System.out.println(str);
+        JSONObject jsonObject =  JSONObject.parseObject(str);
     }
 }
