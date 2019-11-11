@@ -1,9 +1,10 @@
 spring:
   datasource:
-    hikari:
+    hikari.c:
       connection-init-sql: SET NAMES utf8mb4
+
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://127.0.0.1/miniapp?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1/miniapp?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password:

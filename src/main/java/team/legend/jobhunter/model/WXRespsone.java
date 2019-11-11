@@ -12,5 +12,5 @@ public class WXRespsone {
     private String nickname;
     private String headimg_url;
     private String last_login;
-    private int gender;
+    private Integer gender;
 }

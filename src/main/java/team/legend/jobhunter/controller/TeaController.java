@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team.legend.jobhunter.exception.ParamErrorException;
 import team.legend.jobhunter.exception.SqlErrorException;
 import team.legend.jobhunter.model.Teacher;
 import team.legend.jobhunter.service.TeaInfoService;
@@ -24,7 +25,7 @@ public class TeaController {
     TeaInfoService teaInfoService;
 
 
-    @PostMapping(value = "/getTeaHome",produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/getTeaInfo",produces = "application/json;charset=UTF-8")
     public String getTeacher(@RequestBody JSONObject jsonObject){
         String teaId = jsonObject.getString("teaId");
 
@@ -36,15 +37,14 @@ public class TeaController {
         if(map.containsKey("fail")){
             return CommonUtil.returnFormatSimp(Constant.ERROR_Tea_InfoError,"get teaInfo fail");
         }
-        Teacher teacher = (Teacher) map.get("teacher");
 
-        return CommonUtil.returnFormat(202,"success",teacher);
+        return CommonUtil.returnFormat(200,"success",map);
     }
 
 
 
     @PostMapping(value = "/modifyTeaInfo",produces ="application/json;charset=UTF-8")
-    public String updateInfo(@RequestParam(value = "headImg",required=false) MultipartFile headImg, @RequestParam("jsonStr") String jsonStr){
+    public String updateInfo(@RequestParam(value = "headImg",required=false) MultipartFile headImg, @RequestParam("jsonStr") String jsonStr) throws ParamErrorException {
 //        ServletInputStream is= null;
 //        String str = null;
 //        try {
@@ -62,7 +62,7 @@ public class TeaController {
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param is error");
         }
 
-        String imgUrl =teaInfoService.saveImg(teaId,headImg);
+        String imgUrl = teaInfoService.saveImg(teaId,headImg);
         Map<String,Object>  teaInfo = teaInfoService.modifyInfo(reqMsg,imgUrl);
 
         if(teaInfo !=null){

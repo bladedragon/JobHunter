@@ -10,7 +10,7 @@ public class Teacher {
     private String tea_nickname;
     private String tea_realname;
     private String tea_img_url;
-    private int gender;
+    private Integer gender;
     private String tea_tele;
     private String tea_email;
     private String tea_description;
@@ -18,7 +18,7 @@ public class Teacher {
     private String tea_company;
     private String position;
     private String tea_type;
-    private int isonline;
+    private Integer isonline;
     private String verify_code;
 
 }

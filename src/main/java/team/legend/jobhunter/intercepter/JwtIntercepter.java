@@ -33,7 +33,7 @@ public class JwtIntercepter implements HandlerInterceptor {
         String authorization = request.getHeader("Authorization");
 
         Matcher matcher = pattern.matcher(authorization);
-        response.setContentType("application/json; charset=utf-8");
+//        response.setContentType("application/json; charset=utf-8");
         PrintWriter writer = null;
         if(matcher.find()){
             String jwtInHeader = matcher.group(1);
@@ -70,7 +70,7 @@ public class JwtIntercepter implements HandlerInterceptor {
         }
         //项目预计部署在nginx服务器上
         log.warn(">>jwt:cannot find jwt,request ip is [{}]",request.getHeader("X-Forwarded-For"));
-        response.setContentType("application/json; charset=utf-8");
+//        response.setContentType("application/json; charset=utf-8");
         try{
             writer = response.getWriter();
             writer.append(CommonUtil.returnFormatSimp(Constant.ERROR_JWT_NOTEXIST,"cannot find token"));

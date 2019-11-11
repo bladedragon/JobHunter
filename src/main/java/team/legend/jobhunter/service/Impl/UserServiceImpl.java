@@ -108,7 +108,10 @@ public class UserServiceImpl implements UserService {
                 wxDao.updateLastLogin(date,sessionMap.get(0));
                 sessionMap.put(4,wxLogin.getCreate_date());
                 sessionMap.put(5,wxLogin.getLast_login());
-
+                String tea_id = wxLogin.getTea_id();
+                if(tea_id!=null || !tea_id.equals("")){
+                    sessionMap.put(10,tea_id);
+                }
             }
 
             sessionMap.put(3,user_id);
@@ -124,7 +127,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String,Object> authorizeData(String user_id, String openid, String rawData,String signature ) throws AuthorizeErrorException {
+    public Map<String,Object> authorizeData(String user_id, String openid, String rawData,String signature) throws AuthorizeErrorException {
         String signature2 = SecretUtil.shaCheck(rawData,signature);
         if(signature2.equals(signature)){
             JSONObject userInfo = JSONObject.parseObject(rawData);

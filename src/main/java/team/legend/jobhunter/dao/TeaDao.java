@@ -22,9 +22,9 @@ public interface TeaDao {
             "WHERE tea_id = #{tea_id}")
     int updateTea(TeaDO teaDo);
 
-    @Insert("INSERT INTO teacher(tea_id,verify_code) " +
-            "VALUES(#{tea_id},#{verify_code})")
-    int insertTea(String tea_id,String verify_code);
+    @Insert("INSERT INTO teacher(tea_id,tea_nickname,tea_img_url,tea_gender,verify_code) " +
+            "VALUES(#{tea_id},#{tea_nickname},#{tea_img_url},#{tea_gender},#{verify_code})")
+    int insertTea(String tea_id,String tea_nickname,String tea_img_url,int tea_gender,String verify_code);
 
     @Select("SELECT tea_img_url FROM teacher WHERE tea_id = #{tea_id}")
     String selectHeadImgByTeaId(@Param("tea_id") String teaId);
@@ -36,7 +36,7 @@ public interface TeaDao {
     int getCount();
 
 
-    /**插入简历数据库老师信息
+    /**已被代替
      * @param tea_id
      * @param tea_nickname
      * @param tea_img_url
@@ -48,21 +48,24 @@ public interface TeaDao {
      * @param positon
      * @return
      */
-    @Update("UPDATE resume_info SET tea_nickname = #{nickname}, " +
-            "tea_img_url = #{tea_img_url}, tea_description= #{tea_description},tea_tag =#{tea_tag}," +
-            "tea_company = #{tea_company},isonline = #{isonline},service_timestamp= #{service_timestamp}," +
-            "position = #{position} " +
-            "WHERE tea_id = #{tea_id} ")
-    int updateResumeInfo(String tea_id,String tea_nickname,String tea_img_url,
-                      String tea_description,String tea_tag,String tea_company,
-                      int isonline,long service_timestamp,String positon);
+//    @Update("UPDATE resume_info SET tea_nickname = #{nickname}, " +
+//            "tea_img_url = #{tea_img_url}, tea_description= #{tea_description},tea_tag =#{tea_tag}," +
+//            "tea_company = #{tea_company},isonline = #{isonline},service_timestamp= #{service_timestamp}," +
+//            "position = #{position} " +
+//            "WHERE tea_id = #{tea_id} ")
+//    int updateResumeInfo(String tea_id,String tea_nickname,String tea_img_url,
+//                      String tea_description,String tea_tag,String tea_company,
+//                      int isonline,long service_timestamp,String positon);
+//
+//    @Update("UPDATE tutor_info SET tea_nickname = #{nickname}, " +
+//            "tea_img_url = #{tea_img_url}, tea_description= #{tea_description},tea_tag =#{tea_tag}," +
+//            "tea_company = #{tea_company},isonline = #{isonline},service_timestamp= #{service_timestamp}," +
+//            "position = #{position} " +
+//            "WHERE tea_id = #{tea_id} ")
+//    int updateTutorInfo(String tea_id,String tea_nickname,String tea_img_url,
+//                         String tea_description,String tea_tag,String tea_company,
+//                         int isonline,long service_timestamp,String positon);
 
-    @Update("UPDATE tutor_info SET tea_nickname = #{nickname}, " +
-            "tea_img_url = #{tea_img_url}, tea_description= #{tea_description},tea_tag =#{tea_tag}," +
-            "tea_company = #{tea_company},isonline = #{isonline},service_timestamp= #{service_timestamp}," +
-            "position = #{position} " +
-            "WHERE tea_id = #{tea_id} ")
-    int updateTutorInfo(String tea_id,String tea_nickname,String tea_img_url,
-                         String tea_description,String tea_tag,String tea_company,
-                         int isonline,long service_timestamp,String positon);
+
+
 }

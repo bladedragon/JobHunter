@@ -55,6 +55,6 @@ public class CommonUtil {
 
         String returnStr = returnFormat(200,"123",map);
 
-        System.out.println(returnStr);
+
     }
 }

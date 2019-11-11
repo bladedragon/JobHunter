@@ -43,6 +43,11 @@ public class UserController {
             data.put("token",login_result.get(6));
             data.put("create_date",login_result.get(4));
             data.put("last_login",login_result.get(5));
+            if(login_result.containsKey(10)){
+                data.put("isTeacher","true");
+            }else{
+                data.put("isTeacher","false");
+            }
         }else{
             return CommonUtil.returnFormatSimp(Integer.parseInt(login_result.get(-2)), login_result.get(-1));
         }
@@ -50,7 +55,7 @@ public class UserController {
         if(reqMsg.containsKey("rawData")&&reqMsg.containsKey("signature")){
             log.info(">>log:authorize start");
             Map<String,Object> authorize_result = userService.authorizeData(login_result.get(3),login_result.get(1),reqMsg.getString("rawData"),reqMsg.getString("signature"));
-
+            data.put("wx_user",authorize_result);
         }else{
             Map<String,Object> oldData = userService.getOldUserData(login_result.get(3));
             if(!data.containsKey("empty")){
@@ -59,6 +64,7 @@ public class UserController {
             }
         }
 
+//        //获取敏感信息
 //        if(reqMsg.containsKey("encryptedData")&reqMsg.containsKey("iv")){
 //            log.info(">>log:authorize start");
 //            Map<String,Object> authorize_result = userService.authorizeEncrypted(login_result.get(3),login_result.get(1),reqMsg.getString("encryptedData"),reqMsg.getString("iv"));

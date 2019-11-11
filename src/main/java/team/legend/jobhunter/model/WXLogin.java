@@ -14,6 +14,7 @@ public class WXLogin {
     private String unionid;
     private String last_login;
     private String create_date;
+    private String tea_id;
 
     public WXLogin(WXLogin wxLogin){
         this.openid = wxLogin.getOpenid();
@@ -21,6 +22,7 @@ public class WXLogin {
         this.unionid = wxLogin.getUnionid();
         this.last_login = wxLogin.getLast_login();
         this.create_date = wxLogin.getCreate_date();
+        this.tea_id = wxLogin.getTea_id();
 
     }
 }

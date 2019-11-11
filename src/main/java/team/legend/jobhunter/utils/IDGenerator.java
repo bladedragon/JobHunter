@@ -8,21 +8,50 @@ import team.legend.jobhunter.dao.WXDao;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class IDGenerator {
 
 
-    public String  createOrderId(String service_id){
-        return null;
+    public String  createOrderId(String service_id,int index){
+        int UID = UUID.randomUUID().toString().hashCode();
+        if(UID<0){
+            UID = -UID;
+        }
+        SimpleDateFormat simpleDateFormat  = new SimpleDateFormat("yyyyMMddHHmmss");
+        String date = simpleDateFormat.format(new Date());
+        String UPServiceId = service_id.toUpperCase().substring(0,5);
+        String OrderId = "79"+date+String.format("%010d", UID)+index;
+        return OrderId;
     }
 
-    public String createPreOrderId(String service_id){
-        return "";
+    public String createPreOrderId(String service_id, int index){
+       int UID  = UUID.randomUUID().toString().hashCode();
+        if (UID < 0) {
+            UID = -UID;
+        }
+        SimpleDateFormat simpleDateFormat  = new SimpleDateFormat("yyyyMMddHHmmss");
+        String date = simpleDateFormat.format(new Date());
+        String UpServiceId = service_id.toUpperCase().substring(0,5);
+        String preOrderId = "80"+date+String.format("%010d", UID)+index;
+
+        return preOrderId;
     }
 
-    public String createServiceId(String stu_id,String tea_id){
-        return "";
+    /**
+     * 生成service_id
+     * 保证teaId和serviceId的一一对应关系，因此只是对teaId进行简单的编码
+     * @param tea_id
+     * @return
+     */
+    public String createServiceId(String tea_id){
+        System.out.println(tea_id);
+        String origin_id ="service-"+tea_id;
+        String service_id = SecretUtil.MD5Encode(origin_id).toLowerCase();
+        return service_id;
     }
     /**
      * 用户ID加密工具
@@ -57,6 +86,8 @@ public class IDGenerator {
     }
 
     public static void main(String[] args) {
-        System.out.println(String.valueOf(System.currentTimeMillis()).substring(0,4));
+//        System.out.println(String.valueOf(System.currentTimeMillis()).substring(0,4));
+        System.out.println(UUID.randomUUID().toString().hashCode());
+
     }
 }

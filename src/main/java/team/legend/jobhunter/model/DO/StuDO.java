@@ -12,7 +12,7 @@ public class StuDO {
     private String img_url;
     private String tele;
     private String email;
-    private int gender;
+    private Integer gender;
     private String descripton;
 
 
