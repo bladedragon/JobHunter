@@ -1,4 +1,4 @@
-package team.legend.jobhunter.model;
+package team.legend.jobhunter.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

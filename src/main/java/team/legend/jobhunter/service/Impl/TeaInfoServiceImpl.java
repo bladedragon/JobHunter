@@ -9,16 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import team.legend.jobhunter.dao.Resume_serviceDao;
-import team.legend.jobhunter.dao.TeaDao;
-import team.legend.jobhunter.dao.Tutor_serviceDao;
-import team.legend.jobhunter.dao.WXDao;
+import team.legend.jobhunter.dao.*;
 import team.legend.jobhunter.exception.ParamErrorException;
 import team.legend.jobhunter.exception.SqlErrorException;
+import team.legend.jobhunter.model.*;
 import team.legend.jobhunter.model.DO.TeaDO;
 import team.legend.jobhunter.model.DO.TeaInfoDo;
 import team.legend.jobhunter.model.DO.WxTeaDO;
-import team.legend.jobhunter.model.Teacher;
 import team.legend.jobhunter.service.TeaInfoService;
 import team.legend.jobhunter.utils.CommonUtil;
 import team.legend.jobhunter.utils.Constant;
@@ -27,6 +24,8 @@ import team.legend.jobhunter.utils.SecretUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -41,8 +40,12 @@ public class TeaInfoServiceImpl implements TeaInfoService {
     @Autowired
     WXDao wxDao;
     @Autowired
+    OrderDao orderDao;
+    @Autowired
     IDGenerator idGenerator;
 
+    @Autowired
+    FileDao fileDao;
     @Autowired
     Resume_serviceDao resumeServiceDao;
     @Autowired
@@ -84,7 +87,6 @@ public class TeaInfoServiceImpl implements TeaInfoService {
     @Override
     public Map<String,Object> modifyInfo(JSONObject jsonObject,String img_url) throws ParamErrorException {
         String teaId = jsonObject.getString("teaId");
-        String teaName = jsonObject.getString("teaName");
         String nickname = jsonObject.getString("nickname");
         String company = jsonObject.getString("company");
         int isOnline = jsonObject.getInteger("isOnline");
@@ -129,7 +131,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
             System.out.println(serviceTypeArray.get(i));
         }
 
-        int num = teaDao.updateTea(new TeaDO(teaId,nickname,teaName,img_url,teles,"",perDes,offers,company,position,serviceTypes,isOnline));
+        //老师真实姓名不能更新
+        int num = teaDao.updateTea(new TeaDO(teaId,nickname,img_url,teles,"",perDes,offers,company,position,serviceTypes,isOnline));
         Teacher teacher = teaDao.selectByTeaId(teaId);
         if(teacher != null){
             List<String> teleList = CommonUtil.toStrList(teacher.getTea_tele());
@@ -235,7 +238,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public String verify(String openid, String verifyCode, String userId) {
+    //同时需要老师真实姓名
+    public String verify(String openid, String verifyCode, String userId, String realname ) {
         String sign = openid+userId;
         String encodeStr = SecretUtil.shaCheck(openid,userId);
         String originStr = sign +encodeStr;
@@ -249,7 +253,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
                 int rank = teaDao.getCount();
                 teaId = idGenerator.createTeaId(userId,openid,rank);
                 int num =teaDao.insertTea(teaId,wxTeaDO.getNickname(),wxTeaDO.getHeadimg_url(),
-                        wxTeaDO.getGender(),verifyCode);
+                        wxTeaDO.getGender(),realname,verifyCode);
                 int result = wxDao.updateTeaId(userId,teaId);
                 return teaId;
             }else{
@@ -258,6 +262,59 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         }else{
             return null;
         }
+    }
+
+    @Override
+    public Map<String, Object> getTeaHome(String teaId) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Map<String,Object> result = new LinkedHashMap<>();
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        int accomplishNum = orderDao.getCountByTStatus(teaId,1);
+        int ordersNum = orderDao.getCountByTeaId(teaId);
+
+        Teacher teacher = teaDao.selectByTeaId(teaId);
+        List<String> offerList = CommonUtil.toStrList(teacher.getTea_tag());
+        result.put("orderNum",ordersNum);
+        result.put("accomplishedNum",accomplishNum);
+        result.put("servingNum",ordersNum-accomplishNum);
+        result.put("teacher",new TeaHomeInfo(teaId,teacher.getTea_nickname(),teacher.getTea_company(),
+                teacher.getIsonline(),offerList));
+
+        List<Order>  orders = orderDao.selectNowDayOrder(teaId,6);
+
+        for (Order order :orders) {
+            Map<String,Object> map = new LinkedHashMap<>();
+
+            Date date = null;
+            try {
+                date = sdf.parse(order.getOrder_date());
+            } catch (ParseException e) {
+                log.error(">>log: TeaHome: date parse is error");
+                e.printStackTrace();
+            }
+            Long nowTimeStamp = date.getTime();
+            String modify_date = sdf.format(order.getOrder_timestamp());
+            map.put("orderId",order.getOrder_id());
+            map.put("stuId",order.getStu_id());
+            map.put("teaId",order.getTea_id());
+            map.put("price",order.getPrice());
+            map.put("orderType",order.getOrder_type());
+            map.put("orderDate",order.getOrder_date());
+            map.put("orderTimestamp",nowTimeStamp);
+            map.put("modifyDate",modify_date);
+            map.put("modifyTimestamp",order.getOrder_timestamp());
+            map.put("confirmTime",order.getAppoint_timestamp());
+            map.put("confirmLocation",order.getAppoint_location());
+
+            List<String> filePaths = fileDao.selectFilePath(order.getOrder_id());
+            StuDetail detail = new StuDetail(order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths);
+            map.put("detail",detail);
+            mapList.add(map);
+        }
+        result.put("serving",mapList);
+
+        return result;
     }
 
 

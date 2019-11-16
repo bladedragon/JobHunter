@@ -23,7 +23,7 @@ public class IDGenerator {
         }
         SimpleDateFormat simpleDateFormat  = new SimpleDateFormat("yyyyMMddHHmmss");
         String date = simpleDateFormat.format(new Date());
-        String UPServiceId = service_id.toUpperCase().substring(0,5);
+//        String UPServiceId = service_id.toUpperCase().substring(0,5);
         String OrderId = "79"+date+String.format("%010d", UID)+index;
         return OrderId;
     }
@@ -35,7 +35,7 @@ public class IDGenerator {
         }
         SimpleDateFormat simpleDateFormat  = new SimpleDateFormat("yyyyMMddHHmmss");
         String date = simpleDateFormat.format(new Date());
-        String UpServiceId = service_id.toUpperCase().substring(0,5);
+//        String UpServiceId = service_id.toUpperCase().substring(0,5);
         String preOrderId = "80"+date+String.format("%010d", UID)+index;
 
         return preOrderId;

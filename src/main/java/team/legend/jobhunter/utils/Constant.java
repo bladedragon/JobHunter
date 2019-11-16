@@ -14,14 +14,16 @@ public class Constant {
 
     //特殊成功码
     public static final int EMPTY_CODE = 201;
+    public static final int FAIL_UPLOAD = 203;
+
 
 
     //错误码
     public static final int ERROR_CODE = 10000;
     public static final int PARAM_CODE = 10001;
-    public static final int UPLOAD_ERROR_CODE = 10002;
+    public static final int INFO_NOTFILLED_CODE = 10002;
     public static final int SPIDER_FAIL_CODE   = 10003;
-    public static final int INFO_NOTFILL_CODE = 10004;
+    public static final int INFO_INVALID_CODE = 10004;
     public static final int INFO_EMPTY_CODE = 10005;
     public static final int REPEAT_CODE = 10006;
 

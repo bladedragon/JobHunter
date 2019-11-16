@@ -16,5 +16,7 @@ public interface TeaInfoService {
 
      Map<String,Object> getTeaInfo(String teaId);
 
-     String verify(String openid, String verifyCode, String userId) throws SqlErrorException;
+     String verify(String openid, String verifyCode, String userId, String realname) throws SqlErrorException;
+
+     Map<String,Object> getTeaHome(String teaId);
 }

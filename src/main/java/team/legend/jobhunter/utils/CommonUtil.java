@@ -19,20 +19,23 @@ public class CommonUtil {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code",code);
         jsonObject.put("msg",msg);
-//        jsonObject.put("timestamp",(System.currentTimeMillis()/100));
         return jsonObject.toJSONString();
     }
+
 
     public static String getNowTime(){
         return String.valueOf(System.currentTimeMillis()/1000);
     }
 
-    public static String getNowDate(){
-        SimpleDateFormat simpleDateFormat  = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static String getNowDate(String pattern){
+        //pattern  = "yyyy-MM-dd HH:mm"
+        SimpleDateFormat simpleDateFormat  = new SimpleDateFormat(pattern);
         String date = simpleDateFormat.format(new Date());
         return date;
 
     }
+
+
 
 
     public static String getRandomStr(int num){
@@ -48,13 +51,12 @@ public class CommonUtil {
 
 
     public static void main(String[] args) {
-        Map<String,String> map = new HashMap<>();
-        map.put("test","AAA");
-        map.put("test2","BBB");
-        map.put("test3","CCC");
+//        Map<String,String> map = new HashMap<>();
+//        map.put("test","AAA");
+//        map.put("test2","BBB");
+//        map.put("test3","CCC");
 
-        String returnStr = returnFormat(200,"123",map);
-
+//        String returnStr = returnFormat(200,"123",map);
 
     }
 }

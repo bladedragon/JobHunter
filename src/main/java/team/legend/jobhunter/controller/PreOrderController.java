@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +34,7 @@ public class PreOrderController {
     @Autowired
     RedisLockHelper redisLockHelper;
 
-    @PostMapping("/savePreOrder")
+    @PostMapping(value = "/savePreOrder",produces = "application/json;charset=UTF-8")
     public String CreatePreOrder(@RequestParam("jsonStr") String jsonStr, @RequestParam(value = "files",required = false) List<MultipartFile> files) throws SqlErrorException, UploadException {
 
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
@@ -66,11 +67,33 @@ public class PreOrderController {
         }
 
         int code = Integer.valueOf(map.get("code"));
+
         Map<String,Object>  result = new HashMap<>(3);
         result.put("stuId",stuId);
         result.put("preOrderId",map.get("preOrderId"));
-        result.put("failUpload",failNum);
+        if(failNum != 0){
+            result.put("failNum",failNum);
+            return CommonUtil.returnFormat(Constant.FAIL_UPLOAD,"success but failUpload",result);
+        }
+
         return CommonUtil.returnFormat(code,"success",result);
     }
 
+    @PostMapping(value = "/cancelPreOrder",produces = "application/json;charset=UTF-8")
+    public String deletePreOrder(@RequestBody JSONObject jsonObject){
+        String preOrderId = jsonObject.getString("preOrderId");
+        if(preOrderId==null || preOrderId.equals("")){
+            return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param not match exception");
+        }
+        String stuId = jsonObject.getString("stuId");
+        int num = preOrderService.cancelPreOrder(stuId,preOrderId);
+        switch(num){
+            case 1: return CommonUtil.returnFormatSimp(200,"success cancel");
+            case 2: return CommonUtil.returnFormatSimp(Constant.INFO_INVALID_CODE,"preOrder is not exist");
+            case 0: return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE," cancel fail");
+            default:
+                log.error("Unknow Error which return code =[{}]",num);
+                return CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"Unknow Error");
+        }
+    }
 }

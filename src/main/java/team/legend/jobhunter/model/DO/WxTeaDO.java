@@ -9,4 +9,5 @@ public class WxTeaDO {
     private String headimg_url;
     private Integer gender;
     private String tea_id;
+    private String realname;
 }

@@ -13,6 +13,7 @@ import team.legend.jobhunter.service.TeaInfoService;
 import team.legend.jobhunter.utils.CommonUtil;
 import team.legend.jobhunter.utils.Constant;
 
+import javax.activation.CommandMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,16 +46,6 @@ public class TeaController {
 
     @PostMapping(value = "/modifyTeaInfo",produces ="application/json;charset=UTF-8")
     public String updateInfo(@RequestParam(value = "headImg",required=false) MultipartFile headImg, @RequestParam("jsonStr") String jsonStr) throws ParamErrorException {
-//        ServletInputStream is= null;
-//        String str = null;
-//        try {
-//            is = request.getInputStream();
-//            BufferedReader br=new BufferedReader(new InputStreamReader(is));
-//            str =br.readLine();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         JSONObject reqMsg = JSONObject.parseObject(jsonStr);
 
         String teaId = reqMsg.getString("teaId");
@@ -76,10 +67,11 @@ public class TeaController {
             String openid = jsonStr.getString("openid");
             String verifyCode = jsonStr.getString("verifyCode");
             String userId = jsonStr.getString("userId");
+            String realname = jsonStr.getString("realName");
 
         String teaId = null;
         try {
-            teaId = teaInfoService.verify(openid,verifyCode,userId);
+            teaId = teaInfoService.verify(openid,verifyCode,userId,realname);
         } catch (SqlErrorException e) {
             e.printStackTrace();
         }
@@ -91,6 +83,21 @@ public class TeaController {
             }
 
             return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_VERIFY_FAIL,"verify fail");
+    }
+
+
+    @PostMapping(value = "/getTeaHome",produces = "application/json;charset=UTF-8")
+    public String getTeaHome(@RequestBody JSONObject jsonObject){
+        String teaId = jsonObject.getString("teaId");
+        if(teaId==null || teaId.equals("")){
+            return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param is error");
+        }
+        Map<String,Object> result = teaInfoService.getTeaHome(teaId);
+        if(result != null){
+            return CommonUtil.returnFormat(200,"success",result);
+        }
+        return CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"Unknow Error");
+
     }
 
     public static void main(String[] args) {

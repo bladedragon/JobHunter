@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import team.legend.jobhunter.model.DO.WxTeaDO;
 import team.legend.jobhunter.model.WXLogin;
 import team.legend.jobhunter.model.WXUser;
-import team.legend.jobhunter.model.response.WxLoginResponse;
 
 @Mapper
 @Component

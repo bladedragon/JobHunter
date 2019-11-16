@@ -58,7 +58,7 @@ public class WxPayServiceImpl implements WxPayService {
         //商户订单号,自己的订单ID
         packageParams.put("out_trade_no", order.getOrder_id() + "");
         //支付金额，这边需要转成字符串类型，否则后面的签名会失败
-        packageParams.put("total_fee", order.getItem_price() + "");
+        packageParams.put("total_fee", order.getPrice() + "");
         packageParams.put("spbill_create_ip", ipAddr);
         //支付成功后的回调地址
         packageParams.put("notify_url", notify_url);
@@ -77,7 +77,7 @@ public class WxPayServiceImpl implements WxPayService {
                 + "<openid>" + openid + "</openid>"
                 + "<out_trade_no>" + order.getOrder_id() + "</out_trade_no>"
                 + "<spbill_create_ip>" + ipAddr + "</spbill_create_ip>"
-                + "<total_fee>" + order.getItem_price() + "</total_fee>"//支付的金额，单位：分
+                + "<total_fee>" + order.getPrice() + "</total_fee>"//支付的金额，单位：分
                 + "<trade_type>" + TRADETYPE + "</trade_type>"
                 + "<sign>" + mysign + "</sign>"
                 + "</xml>";

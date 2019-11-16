@@ -27,6 +27,8 @@ public class PreOrder {
     private Long expire;
     private Integer price;
     private Integer discount;
+    private Long timestamp;
+
 
     public PreOrder(String preOrder_id ,String service_id,String tea_id,String stu_id,
                     String realname,String tele,String experience,String requirement,Integer isonline,
@@ -47,6 +49,7 @@ public class PreOrder {
         this.order_type = order_type;
         this.price = price;
         this.discount = discount;
+        this.timestamp = System.currentTimeMillis()/1000;
 
     }
 }

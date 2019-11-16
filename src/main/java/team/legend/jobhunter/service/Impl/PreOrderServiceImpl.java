@@ -10,22 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import team.legend.jobhunter.dao.FileDao;
-import team.legend.jobhunter.dao.ItemDao;
 import team.legend.jobhunter.dao.PreOrderDao;
 import team.legend.jobhunter.exception.SqlErrorException;
 import team.legend.jobhunter.exception.UploadException;
 import team.legend.jobhunter.model.PreOrder;
-import team.legend.jobhunter.model.TimeItem;
 import team.legend.jobhunter.service.PreOrderService;
 import team.legend.jobhunter.utils.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 逻辑要大改
@@ -47,39 +43,39 @@ public class PreOrderServiceImpl implements PreOrderService {
     @Autowired
     FileDao fileDao;
 
-    //TODO 防止订单重复提交
 
-    @Override
-    public Map<String, PreOrder> createPreOrder(String service_type,String service_id, String stu_id, String tea_id,TimeItem timeItem) {
-        Map<String,PreOrder> res_map = new HashMap<>(10);
 
-        String lockTimestamp = String.valueOf(System.currentTimeMillis()+ Constant.LOCK_EXPIRE_TIME);
-
-//        redisLockHelper.lock(service_id,lockTimestamp);
-
-        PreOrder preOrder = preOrderRedisTemplate.opsForValue().get(service_id);
-        if(preOrder == null){
-            //获取ID计算公式等待完善
-            String preOrderId = idGenerator.createPreOrderId(service_id,1);
-            String orderId = idGenerator.createOrderId(service_id,1);
-            //价格计算公式等待完善
-//            String price = PriceUtil.getPrice(timeItem.getItem_origin_price(),timeItem.getItem_discount());
-//            String currTime = String.valueOf(System.currentTimeMillis()/1000);
-//            preOrder = new PreOrder(preOrderId,orderId,service_id,tea_id,stu_id,timeItem.getItem_id(),timeItem.getItem_time(),
-//                    price,timeItem.getIsonline(),timeItem.getItem_time_detail(),currTime
-//                    ,service_type,System.currentTimeMillis()/1000);
-            //插入redis数据库
-            preOrderRedisTemplate.opsForValue().set(service_id,preOrder);
-            PreOrder preOrder_res = preOrderRedisTemplate.opsForValue().get(service_id);
-            res_map.put("success",preOrder_res);
-
-        }else{
-            res_map.put("be created!",preOrder);
-        }
-
-//        redisLockHelper.unlock(service_id,lockTimestamp);
-        return res_map;
-    }
+//    @Override
+//    public Map<String, PreOrder> createPreOrder(String service_type,String service_id, String stu_id, String tea_id,TimeItem timeItem) {
+//        Map<String,PreOrder> res_map = new HashMap<>(10);
+//
+//        String lockTimestamp = String.valueOf(System.currentTimeMillis()+ Constant.LOCK_EXPIRE_TIME);
+//
+////        redisLockHelper.lock(service_id,lockTimestamp);
+//
+//        PreOrder preOrder = preOrderRedisTemplate.opsForValue().get(service_id);
+//        if(preOrder == null){
+//            //获取ID计算公式等待完善
+//            String preOrderId = idGenerator.createPreOrderId(service_id,1);
+//            String orderId = idGenerator.createOrderId(service_id,1);
+//            //价格计算公式等待完善
+////            String price = PriceUtil.getPrice(timeItem.getItem_origin_price(),timeItem.getItem_discount());
+////            String currTime = String.valueOf(System.currentTimeMillis()/1000);
+////            preOrder = new PreOrder(preOrderId,orderId,service_id,tea_id,stu_id,timeItem.getItem_id(),timeItem.getItem_time(),
+////                    price,timeItem.getIsonline(),timeItem.getItem_time_detail(),currTime
+////                    ,service_type,System.currentTimeMillis()/1000);
+//            //插入redis数据库
+//            preOrderRedisTemplate.opsForValue().set(service_id,preOrder);
+//            PreOrder preOrder_res = preOrderRedisTemplate.opsForValue().get(service_id);
+//            res_map.put("success",preOrder_res);
+//
+//        }else{
+//            res_map.put("be created!",preOrder);
+//        }
+//
+////        redisLockHelper.unlock(service_id,lockTimestamp);
+//        return res_map;
+//    }
 
     @Override
     @Transactional(rollbackFor = IOException.class)
@@ -103,7 +99,7 @@ public class PreOrderServiceImpl implements PreOrderService {
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate(),1);
+                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -142,7 +138,7 @@ public class PreOrderServiceImpl implements PreOrderService {
         //插入待付款订单，存在即更新
 
         String preOrder_id = null;
-        PreOrder preOrder = preOrderDao.selectAll(teaId,stuId);
+        PreOrder preOrder = preOrderDao.selectAllByTeaIdAndStuId(teaId,stuId);
 
         if(preOrder == null){
             String service_id = idGenerator.createServiceId(teaId);
@@ -157,11 +153,11 @@ public class PreOrderServiceImpl implements PreOrderService {
             res_map.put("code","201");
         }else{
             //只更新用户的几个字段
-            preOrderDao.updatePreOrder(realName,tele,experience,requirement,isonline,price,discount,CommonUtil.getNowDate());
+            preOrderDao.updatePreOrder(realName,tele,experience,requirement,isonline,price,discount,System.currentTimeMillis()/1000);
             res_map.put("code","202");
         }
 
-        preOrder = preOrderDao.selectAll(teaId, stuId);
+        preOrder = preOrderDao.selectAllByTeaIdAndStuId(teaId, stuId);
 
         //是否超过过期时间
 
@@ -174,12 +170,25 @@ public class PreOrderServiceImpl implements PreOrderService {
             res_map.put("overTime",null);
             return res_map;
         }else{
-//            res_map.put("stuId",stuId);
+
             res_map.put("preOrderId",preOrder.getPreorder_id());
         }
 
         return res_map;
     }
+
+    @Override
+    public int cancelPreOrder(String stuId, String preOrderId) {
+
+        String stuIdInBase = preOrderDao.selectStuIdByPreOrderId(preOrderId);
+        if(stuId.equals(stuIdInBase)){
+            int num = preOrderDao.deletePreOrder(preOrderId);
+            return num;
+        }
+        log.error("stuId is not equal with stuId in Database or null");
+        return 2;
+    }
+
 
     public static void main(String[] args) {
         Map<String,Object> map = new HashMap<>();
