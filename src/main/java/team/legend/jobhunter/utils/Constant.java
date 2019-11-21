@@ -9,12 +9,15 @@ public class Constant {
     public static final int UNKNOW = 0;
 
     public static final long LOCK_EXPIRE_TIME = 5000;
+    public static final int  PREORDER_EXPIRE_DAY = 3;
 
     public static final long MAX_FILE_SIZE = 15*1024*1000;
 
     //特殊成功码
     public static final int EMPTY_CODE = 201;
+    public static final int DUPLICATION = 202;
     public static final int FAIL_UPLOAD = 203;
+
 
 
 
@@ -41,8 +44,8 @@ public class Constant {
 
 
     //教师端相关错误码
-    public static final int ERROR_Tea_ERROR_CODE = 40000;
-    public static final int ERROR_Tea_InfoError = 40001;
+    public static final int ERROR_TEA_ERROR_CODE = 40000;
+    public static final int ERROR_TEA_InfoError = 40001;
     public static final int ERROR_TEA_VERIFY_FAIL = 40002;
     public static final int ERROR_TEA_VERIFY_DUPLICATION = 40003;
 

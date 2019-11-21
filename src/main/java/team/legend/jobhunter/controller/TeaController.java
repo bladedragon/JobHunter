@@ -36,7 +36,7 @@ public class TeaController {
         }
         Map<String,Object> map = teaInfoService.getTeaInfo(teaId);
         if(map.containsKey("fail")){
-            return CommonUtil.returnFormatSimp(Constant.ERROR_Tea_InfoError,"get teaInfo fail");
+            return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_InfoError,"get teaInfo fail");
         }
 
         return CommonUtil.returnFormat(200,"success",map);
@@ -59,7 +59,7 @@ public class TeaController {
         if(teaInfo !=null){
             return CommonUtil.returnFormat(200,"success",teaInfo);
         }
-        return CommonUtil.returnFormatSimp(Constant.ERROR_Tea_InfoError,"cannot get teaInfo");
+        return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_InfoError,"cannot get teaInfo");
     }
 
     @PostMapping(value = "/verify",produces = "application/json;charset=UTF-8")
@@ -68,6 +68,7 @@ public class TeaController {
             String verifyCode = jsonStr.getString("verifyCode");
             String userId = jsonStr.getString("userId");
             String realname = jsonStr.getString("realName");
+            HashMap<String,String> result = new HashMap<>(1);
 
         String teaId = null;
         try {
@@ -77,9 +78,10 @@ public class TeaController {
         }
         if(teaId != null){
                 if(teaId.equals("duplication")){
-                    return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_VERIFY_DUPLICATION,"verify duplication");
+                    return CommonUtil.returnFormatSimp(Constant.DUPLICATION,"verify duplication");
                 }
-                return CommonUtil.returnFormat(200,"success",teaId);
+                result.put("teaId",teaId);
+                return CommonUtil.returnFormat(200,"success",result);
             }
 
             return CommonUtil.returnFormatSimp(Constant.ERROR_TEA_VERIFY_FAIL,"verify fail");
@@ -105,15 +107,15 @@ public class TeaController {
         List<String> offer = new ArrayList<>();
         List<String> tele = new ArrayList<>();
         List<String> server = new ArrayList<>();
-        map.put("teaId","123");
-        map.put("teaName","jainhlaosh ");
-        map.put("nickname","jaing");
-        map.put("company","legned");
+        map.put("teaId","3368743342");
+        map.put("teaName","竹祯铮 ");
+        map.put("nickname","😴");
+        map.put("company","冷刃科技有限公司");
         map.put("isOnline",0);
         map.put("offer",offer);
-        map.put("perDes","asdasd");
+        map.put("perDes","这是一段自我简介，不大于100字");
         map.put("tele",tele);
-        map.put("position","asd");
+        map.put("position","板砖工人");
         map.put("serviceType",server);
         String str = JSON.toJSONString(map);
         System.out.println(str);

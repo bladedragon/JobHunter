@@ -25,14 +25,17 @@ public class ConfirmServiceImpl  implements ConfirmService {
 
         Map<String,String> response = new HashMap<>(2);
         OrderValidDO teaIdInBase = orderDao.selectTeaId(orderId);
-        if(teaIdInBase.getOrder_status() == 1 || teaIdInBase.getOrder_confirm() ==1){
-            log.error(">>log:teaFill: order_status[{}],order_confirm[{}]",teaIdInBase.getOrder_status(),teaIdInBase.getOrder_confirm());
-            response.put("invalid","commit invalid");
-            return response;
-        }
+
+
         if(teaIdInBase ==null || !teaIdInBase.getTea_id().equals(teaId)){
             log.error(">>log: teaFill: teaId[{}] is null or not belong this order",teaId);
             response.put("nullError","teacher is null or not belong this order");
+            return response;
+        }
+
+        if(teaIdInBase.getOrder_status() == 1 || teaIdInBase.getOrder_confirm() ==1){
+            log.error(">>log:teaFill: order_status[{}],order_confirm[{}]",teaIdInBase.getOrder_status(),teaIdInBase.getOrder_confirm());
+            response.put("invalid","commit invalid");
             return response;
         }
 
@@ -48,6 +51,7 @@ public class ConfirmServiceImpl  implements ConfirmService {
     @Override
     public int confirm(String userId, String orderId) {
         OrderValidDO order = orderDao.selectValidInfo(orderId);
+        System.out.println(order);
         if(order ==null || order.getOrder_status() ==1 || !userId.equals(order.getStu_id())){
             log.error(">>log: confirm order [{}] is null  or orderStatus is[{}] or stuId is not matched [{}] ",orderId,order.getOrder_status(),order.getStu_id());
             return 1;
@@ -73,9 +77,10 @@ public class ConfirmServiceImpl  implements ConfirmService {
         Map<String,String> response = new HashMap<>(2);
         int num = 0;
         //以下是老师确认
+        log.info("isTeacher? [{}]",isTea);
         if(isTea==1){
             OrderValidDO teaIdInBase = orderDao.selectTeaId(orderId);
-            if(teaIdInBase.getOrder_status() == 1 || teaIdInBase.getOrder_confirm() ==1){
+            if(teaIdInBase.getOrder_status() == 1 || teaIdInBase.getOrder_confirm() !=1){
                 log.error(">>log:teaFill: order_status[{}],order_confirm[{}]",teaIdInBase.getOrder_status(),teaIdInBase.getOrder_confirm());
                 response.put("invalid","commit invalid");
                 return response;
@@ -92,13 +97,14 @@ public class ConfirmServiceImpl  implements ConfirmService {
                     num  += orderDao.updateStatus(orderId);
                 }
             }catch (Exception e){
+                e.printStackTrace();
                 throw new SqlErrorException("sql exception");
             }
 
             //以下是学生确认
         }else {
             OrderValidDO stuIdInBase = orderDao.selectStuId(orderId);
-            if(stuIdInBase.getOrder_status() == 1 || stuIdInBase.getOrder_confirm() ==1){
+            if(stuIdInBase.getOrder_status() == 1 || stuIdInBase.getOrder_confirm() !=1){
                 log.error(">>log:stuConfirm: order_status[{}],order_confirm[{}]",stuIdInBase.getOrder_status(),stuIdInBase.getOrder_confirm());
                 response.put("invalid","commit invalid");
                 return response;
@@ -121,12 +127,11 @@ public class ConfirmServiceImpl  implements ConfirmService {
 
         }
 
-        System.out.println(num);
-        if(num ==2){
+        if(num == 2){
             response.put("success","success and status changed");
             return response;
         }else if(num ==1){
-            response.put("success","success ");
+            response.put("success","success");
             return response;
         }else{
             log.error(">>log: ConformAccomplish: update num  [{}]",num);

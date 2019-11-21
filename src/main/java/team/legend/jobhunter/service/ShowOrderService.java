@@ -5,6 +5,6 @@ import java.util.Map;
 
 public interface ShowOrderService {
 
-     List<Map<String,Object>> showOrder(String stuId, int isTea,int Accomplished);
+     Map<String,Object> showOrder(String stuId, int isTea,int Accomplished,int page,int pagezise);
 
 }

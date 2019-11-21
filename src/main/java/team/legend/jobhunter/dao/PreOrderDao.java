@@ -34,7 +34,7 @@ public interface PreOrderDao {
     //只更新用户的几个字段
     @Update("UPDATE preorder SET realname = #{realname} ,tele = #{tele}, experience = #{experience}," +
             "requirement = #{requirement}, isonline = #{isonline}," +
-            "price = #{price}, discount = #{discount} ,create_date = #{create_date}")
+            "price = #{price}, discount = #{discount} ,timestamp = #{timestamp}")
     int updatePreOrder(String realname,String tele,String experience,String requirement,
                        Integer isonline,Integer price,Integer discount,Long timestamp);
 
@@ -45,7 +45,7 @@ public interface PreOrderDao {
     int getCountByStuId(@Param("stu_id") String stu_id);
 
     @Delete("DELETE FROM preorder WHERE preorder_id = #{preorder_id}")
-    int deletePreOrder(String preorder_id);
+    int deletePreOrder(@Param("preorder_id") String preorder_id);
 
     @Insert("INSERT INTO invalid_order(order_id, tea_id, stu_id, realname, tele, experience," +
             "requirement, isonline, order_date, order_type, price, discount) " +
@@ -56,9 +56,12 @@ public interface PreOrderDao {
                            String requirement,int isonline,String order_date,String order_type,int price,
                            int discount);
 
-    @Select("SELECT * FROM preorder WHERE stu_id = #{stu_id} ORDER BY timestamp  ")
+
+
+    @Select("SELECT * FROM preorder WHERE stu_id = #{stu_id} ORDER BY timestamp DESC ")
     List<PreOrder> selectByStuId(String stu_id);
 
+    //取消订单接口
     @Select("SELECT stu_id FROM preorder WHERE preorder_id = #{preorder_id}")
     String selectStuIdByPreOrderId(String preorde_id);
 

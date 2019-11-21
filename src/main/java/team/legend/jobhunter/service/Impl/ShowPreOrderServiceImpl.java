@@ -7,6 +7,7 @@ import team.legend.jobhunter.dao.FileDao;
 import team.legend.jobhunter.dao.PreOrderDao;
 import team.legend.jobhunter.dao.ShowPreOrderDao;
 import team.legend.jobhunter.dao.TeaDao;
+import team.legend.jobhunter.model.DO.FileDO;
 import team.legend.jobhunter.model.DO.OrderTeaDO;
 import team.legend.jobhunter.model.Detail;
 import team.legend.jobhunter.model.PreOrder;
@@ -43,6 +44,12 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
             map.put("teaId",preOrder.getTea_id());
             map.put("stuId",preOrder.getStu_id());
             map.put("orderDate",preOrder.getCreate_date());
+            if(preOrder.getExpire()-System.currentTimeMillis()/1000< 0){
+                map.put("isExpire",1);
+                continue;
+            }else{
+                map.put("isExpire",0);
+            }
 
             Date date = null;
             try {
@@ -59,46 +66,21 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
             map.put("orderType",preOrder.getOrder_type());
             map.put("price",preOrder.getPrice());
             map.put("discount",preOrder.getDiscount());
-//            Map<String,Object> detail = new HashMap<>(13);
 
             OrderTeaDO teacher = teaDao.selectOrderDoBYTeaId(preOrder.getTea_id());
             if(teacher == null){
+
                 log.error("cannot find teacher info,teaId :[{}]",preOrder.getTea_id());
-                List<String> filePaths = fileDao.selectFilePath(preOrder.getPreorder_id());
-                Detail detail = new Detail("","",0,"","",0,
-                        null,"",preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),filePaths);
-//                detail.put("teaError",1);
-//                detail.put("stuRealname",preOrder.getRealname());
-//                detail.put("stuTele",preOrder.getTele());
-//                detail.put("stuExperience",preOrder.getExperience());
-//                detail.put("stuGuidance",preOrder.getRequirement());
-//                detail.put("fileUrl",filePaths);
-                map.put("detail",detail);
                 map.put("teaError",1);
+
                 mapList.add(map);
                 continue;
             }
             List<String> offerList = CommonUtil.toStrList(teacher.getTea_tag());
-            List<String> filePaths = fileDao.selectFilePath(preOrder.getPreorder_id());
+            List<FileDO> filePaths = fileDao.selectFilePath(preOrder.getPreorder_id());
             Detail detail = new Detail(teacher.getTea_nickname(),teacher.getTea_img_url(),teacher.getTea_gender(),
                     teacher.getPosition(),teacher.getTea_company(),teacher.getIsonline(),offerList,teacher.getTea_description(),
                     preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),filePaths);
-//            detail.put("teaName",teacher.getTea_nickname());
-//            detail.put("teaHeadImg",teacher.getTea_img_url());
-//            detail.put("teaGender",teacher.getTea_gender());
-//            detail.put("teaPosition",teacher.getPosition());
-//            detail.put("teaCompany",teacher.getTea_company());
-//            detail.put("teaIsOnline",teacher.getIsonline());
-//            List<String> offerList = CommonUtil.toStrList(teacher.getTea_tag());
-//            detail.put("teaOffer",offerList);
-//            detail.put("teaPreDes",teacher.getTea_description());
-//            //学生信息
-//            detail.put("stuRealname",preOrder.getRealname());
-//            detail.put("stuTele",preOrder.getTele());
-//            detail.put("stuExperience",preOrder.getExperience());
-//            detail.put("stuGuidance",preOrder.getRequirement());
-//            List<String> filePaths = fileDao.selectFilePath(preOrder.getPreorder_id());
-//            detail.put("fileUrl",filePaths);
             map.put("detail",detail);
             mapList.add(map);
         }

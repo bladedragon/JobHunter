@@ -31,7 +31,7 @@ public class LoveServiceImpl implements LoveService {
         int num = 0;
         //标识是否是收藏
         int flag = 0;
-        if(offerId.equals(loveItems.getOffer_id())) {
+        if(loveItems !=null && offerId.equals(loveItems.getOffer_id())) {
             num = loveDao.delete(stuId);
             flag = 1;
         }else{
@@ -40,7 +40,7 @@ public class LoveServiceImpl implements LoveService {
         }
 
         if(num != 1){
-            log.error("cannot insert or delete loveItem stuid[{}], offerId[{}]",stuId,offerId);
+            log.error("cannot insert or delete loveItem stuid[{}], offerId[{}], num = [{}]",stuId,offerId,num);
             throw new SqlErrorException("cannot love ");
         }
         return flag;
@@ -48,7 +48,7 @@ public class LoveServiceImpl implements LoveService {
     }
 
     @Override
-    public Map<String, Object> getLove(String stuId) {
+    public Map<String, Object> getLove(String stuId,int page,int pagesize) {
 
         Map<String,Object> responseMap = new LinkedHashMap<>();
         List<Map<String,Object>> mapList = new ArrayList<>();
@@ -56,7 +56,7 @@ public class LoveServiceImpl implements LoveService {
         Map<String,Object> map = new LinkedHashMap<>();
         int num = loveDao.count(stuId);
         responseMap.put("total",num);
-        List<LoveItem> loveItemList = loveDao.selectByStuId(stuId);
+        List<LoveItem> loveItemList = loveDao.selectByStuId(stuId,page,pagesize);
         for (LoveItem loveItem: loveItemList) {
             OfferInfo offerInfo = offerDao.selectOfferInfoByOfferId(loveItem.getOffer_id());
             String date = simp.format(offerInfo.getUpdate_timestamp());

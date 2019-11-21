@@ -186,7 +186,7 @@ public class OrderServiceImpl implements OrderService {
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(orderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1);
+                    int num = fileDao.insertFileUrl(orderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1,originFileName);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -207,8 +207,8 @@ public class OrderServiceImpl implements OrderService {
         map.put("orderType","resume");
         map.put("realName","蒋龙");
         map.put("tele","123454654");
-        map.put("experience","sdoiashdoiashf");
-        map.put("guidance","大撒大撒安神颗粒的你看受到了看上了看你的");
+        map.put("experience","这是一段经历，大概要写好些话");
+        map.put("guidance","这是用户的需求，以及渴望得到的指导");
         map.put("isonline",1);
         map.put("price",20000);
         map.put("discount",98);

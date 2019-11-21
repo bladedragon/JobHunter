@@ -13,6 +13,7 @@ import team.legend.jobhunter.dao.*;
 import team.legend.jobhunter.exception.ParamErrorException;
 import team.legend.jobhunter.exception.SqlErrorException;
 import team.legend.jobhunter.model.*;
+import team.legend.jobhunter.model.DO.FileDO;
 import team.legend.jobhunter.model.DO.TeaDO;
 import team.legend.jobhunter.model.DO.TeaInfoDo;
 import team.legend.jobhunter.model.DO.WxTeaDO;
@@ -53,6 +54,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
     @Override
     public String saveImg(String tea_id,MultipartFile headImg) {
+
         if(null != headImg ){
             String originFileName = headImg.getOriginalFilename().toLowerCase();
             String[] strs = originFileName.split("\\.");
@@ -64,23 +66,25 @@ public class TeaInfoServiceImpl implements TeaInfoService {
                     String fileName = preName + CommonUtil.getNowTime();
                     String fileFullName = tea_id+"/"+fileName+"."+fileSuffix;
                     String imgFullUrl = imgUrl+fileFullName;
+                    File dir = new File(imgUrl+tea_id);
+                    dir.mkdirs();
                     File file = new File(imgFullUrl);
                     try {
                         headImg.transferTo(file);
                         teaDao.uploadImg(tea_id,imgFullUrl);
                         return imgFullUrl;
                     } catch (IOException e) {
+                        log.error(">>log: img  upload fail!!");
                         e.printStackTrace();
                     }
                 }
             }
 
-        }else{
+        }
             String imgFullUrl = teaDao.selectHeadImgByTeaId(tea_id);
+            log.info(">>log : tahcer upload default img ");
             //老师一定会有头像的
             return imgFullUrl;
-        }
-        return null;
     }
 
     @Transactional(rollbackFor = RuntimeException.class)
@@ -100,14 +104,14 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         String offers = "";
         for(int i =0;i<offerArray.size();i++){
             if(i!=0){
-                offers += ".";
+                offers += ":";
             }
             offers += offerArray.getString(i);
         }
         String teles ="";
         for(int i =0;i<teleArray.size();i++){
             if(i!=0){
-                teles += ".";
+                teles += ":";
             }
             teles += teleArray.getString(i);
         }
@@ -117,7 +121,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
         for(int i =0;i<serviceTypeArray.size();i++){
             if(i!=0){
-                serviceTypes += ".";
+                serviceTypes += ":";
             }
             if(serviceTypeArray.get(i).equals("resume")){
                 flag += 10;
@@ -200,7 +204,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
        @Override
     public Map<String, Object> getTeaInfo(String teaId) {
         Map<String,Object> teaMap = new HashMap<>(5);
-        System.out.println(teaId);
+           System.out.println(teaId);
         Teacher teacher = teaDao.selectByTeaId(teaId);
            if(teacher != null){
                List<String> teleList = CommonUtil.toStrList(teacher.getTea_tele());
@@ -307,7 +311,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
             map.put("confirmTime",order.getAppoint_timestamp());
             map.put("confirmLocation",order.getAppoint_location());
 
-            List<String> filePaths = fileDao.selectFilePath(order.getOrder_id());
+            List<FileDO> filePaths = fileDao.selectFilePath(order.getOrder_id());
             StuDetail detail = new StuDetail(order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths);
             map.put("detail",detail);
             mapList.add(map);
@@ -328,7 +332,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
     public static void main(String[] args) {
         TeaInfoServiceImpl teaInfoService = new TeaInfoServiceImpl();
-        String code = teaInfoService.getVerifyCode("12345","09876");
+        String code = teaInfoService.getVerifyCode("zzzopenid","zzz");
         System.out.println(code);
     }
 }

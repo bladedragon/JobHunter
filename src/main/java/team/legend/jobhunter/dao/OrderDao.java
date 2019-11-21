@@ -49,13 +49,23 @@ public interface OrderDao {
         @Select("SELECT COUNT(*) FROM orders WHERE stu_id = #{stu_id} ")
         int getCountByStuId(@Param("stu_id") String stu_id);
 
+        @Select("SELECT * FROM  orders t1 " +
+        "INNER JOIN (" +
+        "SELECT order_id FROM orders WHERE stu_id = #{stu_id} AND order_status = #{order_status} " +
+                "ORDER BY order_timestamp DESC LIMIT #{page}, #{pagesize} " +
+        ") t2 " +
+        "ON t1.order_id = t2.order_id")
+//        @Select("SELECT * FROM orders WHERE stu_id = #{stu_id} AND order_status = #{order_status} ORDER BY order_timestamp ,order_id DESC LIMIT #{page}, #{pagesize}")
+        List<Order> selectByStuId(String stu_id,int order_status,int page,int pagesize);
 
-
-        @Select("SELECT * FROM orders WHERE stu_id = #{stu_id} AND order_status = #{order_status} ORDER BY order_timestamp  ")
-        List<Order> selectByStuId(String stu_id,int order_status);
-
-        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND order_status = #{order_status} ORDER BY order_timestamp  ")
-        List<Order> selectByTeaId(String tea_id,int order_status);
+//        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND order_status = #{order_status} ORDER BY order_timestamp DESC ")
+        @Select("SELECT * FROM  orders t1 " +
+        "INNER JOIN (" +
+        "SELECT order_id FROM orders WHERE tea_id = #{tea_id} AND order_status = #{order_status} " +
+        "ORDER BY order_timestamp DESC LIMIT #{page}, #{pagesize} " +
+        ") t2 " +
+        "ON t1.order_id = t2.order_id")
+        List<Order> selectByTeaId(String tea_id,int order_status,int page,int pagesize);
 
 
         @Select("SELECT tea_id,order_status,order_confirm,stu_confirm, tea_confirm FROM orders WHERE order_id = #{order_id}")
@@ -67,13 +77,13 @@ public interface OrderDao {
         @Update("UPDATE orders SET order_timestamp = #{order_timestamp},appoint_location = #{appoint_location} , appoint_timestamp = #{appoint_timestamp} WHERE order_id = #{order_id}")
         int updateOrderInfo(@Param("order_timestamp") Long timestamp,@Param("order_id") String order_id, @Param("appoint_location") String appoint_location, @Param("appoint_timestamp") Long appoint_time);
 
-        @Update("UPDATE orders SET order_confirm = 1 WHERE order_id = #{order_id},order_timestamp = #{order_timestamp}")
+        @Update("UPDATE orders SET order_confirm = 1 , order_timestamp = #{order_timestamp} WHERE order_id = #{order_id} ")
         int confirmOrder(@Param("order_id") String order_id,@Param("order_timestamp") Long order_timestamp);
 
-        @Update("UPDATE orders SET stu_confirm = 1 WHERE order_id = #{order_id},order_timestamp = #{order_timestamp]")
+        @Update("UPDATE orders SET stu_confirm = 1 , order_timestamp = #{order_timestamp} WHERE order_id = #{order_id} ")
         int confirmStuAccomplish(String order_id,Long order_timestamp);
 
-        @Update("UPDATE orders SET tea_confirm = 1 WHERE order_id = #{order_id},order_timestamp = #{order_timestamp}")
+        @Update("UPDATE orders SET tea_confirm = 1 , order_timestamp = #{order_timestamp} WHERE order_id = #{order_id} ")
         int confirmTeaAccomplish(String order_id,Long order_timestamp);
 
         @Select("SELECT stu_id, order_status,order_confirm,appoint_timestamp,appoint_location FROM orders WHERE order_id = #{order_id}")

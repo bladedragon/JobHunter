@@ -52,6 +52,7 @@ public class OrderController {
         }
 
 
+        //可能需要添加preorderId为空的情况
         if(jsonObject.containsKey("preOrderId")){
             String preOrderId = jsonObject.getString("preOrderId");
             map = orderService.createOrder(preOrderId);
@@ -74,7 +75,7 @@ public class OrderController {
 
         }
         if(map.containsKey("repeat")){
-            return CommonUtil.returnFormatSimp(Constant.ERROR_ORDER_CODE,"order has exist");
+            return CommonUtil.returnFormatSimp(Constant.ERROR_DUPLICATION_ORDER,"order has exist");
         }
 
 

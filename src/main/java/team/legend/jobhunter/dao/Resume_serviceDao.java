@@ -17,7 +17,7 @@ public interface Resume_serviceDao {
 
 
     @Select("SELECT * FROM  resume_info t1 " +
-            "JOIN (SELECT service_id FROM resume_info limit #{pagesize}, #{page} ) t2 " +
+            "JOIN (SELECT service_id FROM resume_info limit #{page}, #{pagesize} ) t2 " +
             "ON t1.service_id = t2.service_id")
     List<ShowTeaDO> selectTeaInfo(int pagesize, int page);
 

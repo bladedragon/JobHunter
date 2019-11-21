@@ -36,13 +36,16 @@ public class LoveController {
         return CommonUtil.returnFormat(200,"success",data);
 
     }
+
+    @PostMapping(value = "/getLove",produces = "application/json;charset=UTF-8")
     public String getLove(@RequestBody JSONObject jsonObject){
         String stuId = jsonObject.getString("stuId");
         if(stuId==null || stuId.equals("")){
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param is error");
         }
-
-        Map<String,Object> map = loveService.getLove(stuId);
+        int page = jsonObject.getInteger("page");
+        int pagesize = jsonObject.getInteger("pagesize");
+        Map<String,Object> map = loveService.getLove(stuId,page,pagesize);
 
         return CommonUtil.returnFormat(200,"success",map);
     }

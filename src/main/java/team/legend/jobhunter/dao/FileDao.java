@@ -2,6 +2,7 @@ package team.legend.jobhunter.dao;
 
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
+import team.legend.jobhunter.model.DO.FileDO;
 
 import javax.annotation.Generated;
 import javax.annotation.security.PermitAll;
@@ -13,11 +14,11 @@ public interface FileDao {
 
 
     @Options(useGeneratedKeys = true,keyColumn = "id")
-    @Insert("INSERT INTO file_data (order_id, file_url, update_date,iseffective) " +
-            "VALUES(#{order_id},#{file_url}, #{update_date},#{iseffective})")
+    @Insert("INSERT INTO file_data (order_id, file_url, update_date,iseffective,file_name) " +
+            "VALUES(#{order_id},#{file_url}, #{update_date},#{iseffective},#{file_name})")
     int insertFileUrl(@Param("order_id") String orderId, @Param("file_url") String file_url,
-                      @Param("update_date") String update_date,@Param("iseffective") int iseffective);
+                      @Param("update_date") String update_date,@Param("iseffective") int iseffective,@Param("file_name")String file_name);
 
-    @Select("SELECT * FROM file_data WHERE order_id = #{order_id}")
-    List<String> selectFilePath(String order_id);
+    @Select("SELECT file_name , file_url FROM file_data WHERE order_id = #{order_id}")
+    List<FileDO> selectFilePath(String order_id);
 }

@@ -32,7 +32,7 @@ public class ServiceController {
             return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE,"empty");
         }
 
-        //TODO ：新添加字段 显示已下订单的老师
+        System.out.println(result);
         return CommonUtil.returnFormat(200,"success",result);
     }
     @PostMapping(value = "/getResumeInfo",produces = "application/json;charset=UTF-8")
@@ -43,7 +43,8 @@ public class ServiceController {
         if(result.containsKey("empty")){
             return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE,"empty");
         }
-        //TODO: 先添加字段，显示已下订单老师
+
+        System.out.println(result);
         return CommonUtil.returnFormat(200,"success",result);
     }
 }

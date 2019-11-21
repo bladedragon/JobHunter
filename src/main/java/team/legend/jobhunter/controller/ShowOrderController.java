@@ -26,8 +26,10 @@ public class ShowOrderController {
         if(userId == null || userId.equals("")){
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"stuId is null");
         }
+        int page = jsonObject.getInteger("page");
+        int pagesize = jsonObject.getInteger("pagesize");
 
-        List<Map<String,Object>> mapList = showOrderService.showOrder(userId,isTea,0);
+        Map<String,Object> mapList = showOrderService.showOrder(userId,isTea,0, page,pagesize);
         if(mapList ==null){
             return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE,"cannot find orders");
         }
@@ -41,7 +43,9 @@ public class ShowOrderController {
         if(userId == null || userId.equals("")){
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"stuId is null");
         }
-        List<Map<String,Object>> mapList = showOrderService.showOrder(userId,isTea,1);
+        int page = jsonObject.getInteger("page");
+        int pagesize = jsonObject.getInteger("pagesize");
+        Map<String,Object> mapList = showOrderService.showOrder(userId,isTea,1,page,pagesize);
         if(mapList ==null){
             return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE,"cannot find orders");
         }

@@ -20,6 +20,7 @@ import team.legend.jobhunter.utils.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +100,7 @@ public class PreOrderServiceImpl implements PreOrderService {
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1);
+                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1,originFileName);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -121,7 +122,10 @@ public class PreOrderServiceImpl implements PreOrderService {
     @Override
     @Transactional(rollbackFor = SqlErrorException.class)
     public Map<String, String> createPreOrder(JSONObject jsonObject) throws SqlErrorException {
-        Map<String,String> res_map = new HashMap<>(3);
+
+        Long now = System.currentTimeMillis();
+        log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
+        Map<String,String> res_map = new LinkedHashMap<>();
         String stuId = jsonObject.getString("stuId");
         String teaId = jsonObject.getString("teaId");
         String realName = jsonObject.getString("realName");
@@ -139,13 +143,13 @@ public class PreOrderServiceImpl implements PreOrderService {
 
         String preOrder_id = null;
         PreOrder preOrder = preOrderDao.selectAllByTeaIdAndStuId(teaId,stuId);
-
+        log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
         if(preOrder == null){
             String service_id = idGenerator.createServiceId(teaId);
             int count = preOrderDao.getCount();
             preOrder_id = idGenerator.createPreOrderId(service_id,count);
                 int num = preOrderDao.insertPreOrder(new PreOrder(preOrder_id, service_id, teaId, stuId, realName, tele, experience,
-                        requirement, isonline, order_type, price, discount, 3));
+                        requirement, isonline, order_type, price, discount, Constant.PREORDER_EXPIRE_DAY));
             if(num != 1){
                 log.error(">>log insert preOrder fail");
                 throw new SqlErrorException("插入预订单失败");
@@ -158,7 +162,7 @@ public class PreOrderServiceImpl implements PreOrderService {
         }
 
         preOrder = preOrderDao.selectAllByTeaIdAndStuId(teaId, stuId);
-
+        log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
         //是否超过过期时间
 
         if(preOrder.getExpire()-System.currentTimeMillis()/1000< 0){
@@ -166,14 +170,15 @@ public class PreOrderServiceImpl implements PreOrderService {
             preOrderDao.insertInvaludOrder(preOrder.getPreorder_id(),preOrder.getTea_id(),preOrder.getStu_id(),
                     preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),
                     preOrder.getIsonline(),preOrder.getCreate_date(),preOrder.getOrder_type(),preOrder.getPrice(),preOrder.getDiscount());
-            preOrderDao.deletePreOrder(preOrder_id);
+            int num = preOrderDao.deletePreOrder(preOrder.getPreorder_id());
+
             res_map.put("overTime",null);
             return res_map;
         }else{
 
             res_map.put("preOrderId",preOrder.getPreorder_id());
         }
-
+        log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
         return res_map;
     }
 

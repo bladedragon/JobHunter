@@ -1,5 +1,6 @@
 package team.legend.jobhunter.service.Impl;
 
+import javafx.beans.value.ObservableObjectValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import team.legend.jobhunter.dao.FileDao;
 import team.legend.jobhunter.dao.OrderDao;
 import team.legend.jobhunter.dao.ShowPreOrderDao;
+import team.legend.jobhunter.model.DO.FileDO;
 import team.legend.jobhunter.model.Detail;
 import team.legend.jobhunter.model.Order;
 import team.legend.jobhunter.model.PreOrder;
@@ -27,21 +29,30 @@ public class ShowOrderServiceImpl implements ShowOrderService {
     FileDao fileDao;
 
     @Override
-    public List<Map<String,Object>> showOrder(String userId,int isTea,int isAccomplished) {
+    public Map<String,Object> showOrder(String userId,int isTea,int isAccomplished,int page,int pagesize) {
+        Map<String, Object> result = new LinkedHashMap<>();
         List<Map<String,Object>> mapList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         List<Order> orderList = null;
+        int count = 0;
 
         if(isTea == 1){
-            orderList = orderDao.selectByTeaId(userId,isAccomplished);
+            orderList = orderDao.selectByTeaId(userId,isAccomplished,page,pagesize);
+            count = orderDao.getCountByTeaId(userId);
+
         }else{
-            orderList = orderDao.selectByStuId(userId,isAccomplished);
+            orderList = orderDao.selectByStuId(userId,isAccomplished,page,pagesize);
+            count = orderDao.getCountByStuId(userId);
+
         }
 
         if(orderList == null ||orderList.isEmpty()){
             log.error("cannot find orders ,userId :[{}],is Teacher? [{}]",userId,isTea);
             return null;
         }
+
+        log.info("select list is [{}]",count);
+        result.put("total",count);
         for (Order order: orderList) {
             Map<String,Object> map = new LinkedHashMap<>();
             Date date = null;
@@ -74,14 +85,15 @@ public class ShowOrderServiceImpl implements ShowOrderService {
 
 
             List<String> offerList = CommonUtil.toStrList(order.getTea_tag());
-            List<String> filePaths = fileDao.selectFilePath(order.getOrder_id());
+            List<FileDO> filePaths = fileDao.selectFilePath(order.getOrder_id());
             Detail detail = new Detail(order.getTea_nickname(),order.getTea_img_url(),order.getTea_gender(),
                     order.getPosition(), order.getTea_company(),order.getIsonline(),offerList,order.getTea_description(),
                     order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths);
             map.put("detail",detail);
             mapList.add(map);
         }
-        return mapList;
+        result.put("list",mapList);
+        return result;
     }
 
 

@@ -110,7 +110,7 @@ public class ConfirmController {
         redisLockHelper.unlock(orderId,lockTimestamp);
 
         if(map.containsKey("success")){
-            return CommonUtil.returnFormatSimp(200,"success");
+            return CommonUtil.returnFormatSimp(200,map.get("success"));
         }else{
             if(map.containsKey("error")){
                 return CommonUtil.returnFormatSimp(Constant.INFO_EMPTY_CODE,map.get("error"));

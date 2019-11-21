@@ -8,5 +8,5 @@ public interface LoveService {
 
    int love(String stuId,String offerId) throws SqlErrorException;
 
-   Map<String, Object> getLove(String stuId);
+   Map<String, Object> getLove(String stuId,int page,int pagesize);
 }

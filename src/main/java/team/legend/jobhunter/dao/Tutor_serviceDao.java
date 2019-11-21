@@ -35,8 +35,8 @@ public interface Tutor_serviceDao {
     @Select("SELECT COUNT(*) FROM tutor_info")
     int getCount();
 
-    @Select("SELECT * FROM  resume_info t1 " +
-            "JOIN (SELECT service_id FROM resume_info limit #{pagesize}, #{page} ) t2 " +
+    @Select("SELECT * FROM  tutor_info t1 " +
+            "JOIN (SELECT service_id FROM resume_info limit #{page}, #{pagesize } ) t2 " +
             "ON t1.service_id = t2.service_id")
     List<ShowTeaDO> selectTeaInfo(int pagesize, int page);
 

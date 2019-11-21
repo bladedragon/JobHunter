@@ -37,6 +37,9 @@ public class PreOrderController {
     @PostMapping(value = "/savePreOrder",produces = "application/json;charset=UTF-8")
     public String CreatePreOrder(@RequestParam("jsonStr") String jsonStr, @RequestParam(value = "files",required = false) List<MultipartFile> files) throws SqlErrorException, UploadException {
 
+        long  now = System.currentTimeMillis();
+        log.error("---w------------------{}-----------------------",System.currentTimeMillis()-now);
+
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
         if(null ==jsonObject || jsonObject.isEmpty()){
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param not match exception");
@@ -45,7 +48,7 @@ public class PreOrderController {
         int failNum = 0;
         String stuId = jsonObject.getString("stuId");
         String teaId = jsonObject.getString("teaId");
-
+        log.error("----w---------l--------{}-----------------------",System.currentTimeMillis()-now);
         //上锁
         String lockTimestamp = String.valueOf(System.currentTimeMillis()+ Constant.LOCK_EXPIRE_TIME);
         String lock_id = stuId+"."+teaId;
@@ -54,18 +57,19 @@ public class PreOrderController {
         }
         Map<String, String> map = preOrderService.createPreOrder(jsonObject);
         redisLockHelper.unlock(lock_id,lockTimestamp);
-
+        log.error("-----w------l----------{}-----------------------",System.currentTimeMillis()-now);
         //判断订单是否超时
         if(map.containsKey("overTime")){
-            return  CommonUtil.returnFormatSimp(Constant.ERROR_ORDER_OVERTIME,"preOrder is invalid");
+            return  CommonUtil.returnFormatSimp(Constant.ERROR_ORDER_OVERTIME,"preOrder is overTime");
         }
 
         String preOrderId = map.get("preOrderId");
 
+        log.error("-----w----f------------{}-----------------------",System.currentTimeMillis()-now);
         if(jsonObject.getInteger("isUploadFile") ==1 && files != null ){
             failNum = preOrderService.uploadFile(files,preOrderId);
         }
-
+        log.error("-----w-----f-----------{}-----------------------",System.currentTimeMillis()-now);
         int code = Integer.valueOf(map.get("code"));
 
         Map<String,Object>  result = new HashMap<>(3);

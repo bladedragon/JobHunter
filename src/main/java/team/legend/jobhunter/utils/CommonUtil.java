@@ -1,6 +1,7 @@
 package team.legend.jobhunter.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -13,7 +14,7 @@ public class CommonUtil {
         jsonObject.put("msg", msg);
         jsonObject.put("code", code);
         jsonObject.put("data",data);
-        return jsonObject.toString();
+        return jsonObject.toString(SerializerFeature.DisableCircularReferenceDetect);
     }
     public static String returnFormatSimp(int code,String msg){
         JSONObject jsonObject = new JSONObject();
@@ -43,7 +44,7 @@ public class CommonUtil {
     }
 
     public static List<String> toStrList(String str){
-        String[] strs = str.split("\\.");
+        String[] strs = str.split(":");
         List<String> strList = Arrays.asList(strs);
         return strList;
     }
