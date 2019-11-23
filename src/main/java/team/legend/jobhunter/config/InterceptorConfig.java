@@ -18,9 +18,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //拦截所有的controller
-            registry.addInterceptor(jwtInterceptor).excludePathPatterns("/**").excludePathPatterns("/wx/login")
-            .excludePathPatterns("/modifyTeaInfo");
-
+            registry.addInterceptor(jwtInterceptor).excludePathPatterns("/wx/login");
     }
 
 

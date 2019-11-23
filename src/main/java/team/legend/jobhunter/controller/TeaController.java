@@ -102,6 +102,12 @@ public class TeaController {
 
     }
 
+    @GetMapping("/code")
+    public String getCode(String openid,String userid){
+        String code = teaInfoService.getVerifyCode(openid,userid);
+        return CommonUtil.returnFormat(200,"success",code);
+    }
+    
     public static void main(String[] args) {
         Map<String,Object> map = new HashMap<>();
         List<String> offer = new ArrayList<>();

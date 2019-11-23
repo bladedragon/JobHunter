@@ -4,9 +4,10 @@ public class Constant {
     public static final String[] ALLOW_IMG_SUFFIXS = {"jpg", "png","jpeg","svg"};
     public static final String[] ALLOOW_FILE_SUFFIXS ={""};
 
-    public static final int MALE = 1 ;
-    public static final int FEMALE = 2;
-    public static final int UNKNOW = 0;
+//    public static final int MALE = 1 ;
+//    public static final int FEMALE = 2;
+//    public static final int UNKNOW = 0;
+    public static final int DEFAULT_PRICE_TYPE  =1;
 
     public static final long LOCK_EXPIRE_TIME = 5000;
     public static final int  PREORDER_EXPIRE_DAY = 3;
@@ -29,6 +30,8 @@ public class Constant {
     public static final int INFO_INVALID_CODE = 10004;
     public static final int INFO_EMPTY_CODE = 10005;
     public static final int REPEAT_CODE = 10006;
+    public static final int AUTHORIZE_FAIL = 10007;
+    public static final int UPLOAD_ERROR = 10008;
 
     //支付接口相关错误码
     public static final int ERROR_PAY_CODE = 20000;
@@ -53,6 +56,7 @@ public class Constant {
     public static final int ERROR_ORDER_CODE = 50000;
     public static final int ERROR_DUPLICATION_ORDER = 50001;
     public static final int ERROR_ORDER_OVERTIME = 50002;
+
 
 
 

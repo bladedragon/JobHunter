@@ -32,7 +32,7 @@ public class ServiceController {
             return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE,"empty");
         }
 
-        System.out.println(result);
+
         return CommonUtil.returnFormat(200,"success",result);
     }
     @PostMapping(value = "/getResumeInfo",produces = "application/json;charset=UTF-8")
@@ -44,7 +44,6 @@ public class ServiceController {
             return CommonUtil.returnFormatSimp(Constant.EMPTY_CODE,"empty");
         }
 
-        System.out.println(result);
         return CommonUtil.returnFormat(200,"success",result);
     }
 }

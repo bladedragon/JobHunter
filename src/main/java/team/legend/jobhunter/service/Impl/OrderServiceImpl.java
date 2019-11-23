@@ -105,7 +105,6 @@ public class OrderServiceImpl implements OrderService {
 
         Map<String ,Object> res_map = new HashMap<>(3);
 
-        System.out.println(preOrderId);
         PreOrder preOrder = preOrderDao.selectAllByPreOrderId(preOrderId);
         if(preOrder == null){
             log.error(">>log :preOrder select is null");

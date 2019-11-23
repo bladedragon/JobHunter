@@ -3,6 +3,7 @@ package team.legend.jobhunter.service.Impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Options;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -249,6 +250,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         String originStr = sign +encodeStr;
         String finalStr = SecretUtil.MD5Encode(originStr).toUpperCase();
         String teaId = null;
+        int num = 0;
+        int result = 0;
 
         if(verifyCode.equals(finalStr)){
            WxTeaDO wxTeaDO =wxDao.selectTeaByUserId(userId);
@@ -256,14 +259,16 @@ public class TeaInfoServiceImpl implements TeaInfoService {
             if(oldTeaId == null || oldTeaId.equals("")){
                 int rank = teaDao.getCount();
                 teaId = idGenerator.createTeaId(userId,openid,rank);
-                int num =teaDao.insertTea(teaId,wxTeaDO.getNickname(),wxTeaDO.getHeadimg_url(),
+                 num =teaDao.insertTea(teaId,wxTeaDO.getNickname(),wxTeaDO.getHeadimg_url(),
                         wxTeaDO.getGender(),realname,verifyCode);
-                int result = wxDao.updateTeaId(userId,teaId);
+                 result = wxDao.updateTeaId(userId,teaId);
                 return teaId;
             }else{
+                log.info(">>log: verify duplication ,num:[{}],update result:[{}]",num,result);
                 return "duplication";
             }
         }else{
+            log.error(">>log: verify fail as origin:[{}],now :[{}]",verifyCode,finalStr);
             return null;
         }
     }
@@ -322,7 +327,9 @@ public class TeaInfoServiceImpl implements TeaInfoService {
     }
 
 
-    public String getVerifyCode(String openid,String userId){
+
+    @Override
+    public String getVerifyCode(String openid, String userId){
         String sign = openid+userId;
         String encodeStr = SecretUtil.shaCheck(openid,userId);
         String orignStr = sign+encodeStr;
@@ -332,7 +339,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
     public static void main(String[] args) {
         TeaInfoServiceImpl teaInfoService = new TeaInfoServiceImpl();
-        String code = teaInfoService.getVerifyCode("zzzopenid","zzz");
+        String code = teaInfoService.getVerifyCode("qazwsxedc","zzz123456");
         System.out.println(code);
     }
 }

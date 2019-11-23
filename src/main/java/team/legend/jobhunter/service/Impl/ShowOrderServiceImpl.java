@@ -1,17 +1,13 @@
 package team.legend.jobhunter.service.Impl;
 
-import javafx.beans.value.ObservableObjectValue;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team.legend.jobhunter.dao.FileDao;
 import team.legend.jobhunter.dao.OrderDao;
-import team.legend.jobhunter.dao.ShowPreOrderDao;
 import team.legend.jobhunter.model.DO.FileDO;
 import team.legend.jobhunter.model.Detail;
 import team.legend.jobhunter.model.Order;
-import team.legend.jobhunter.model.PreOrder;
 import team.legend.jobhunter.service.ShowOrderService;
 import team.legend.jobhunter.utils.CommonUtil;
 

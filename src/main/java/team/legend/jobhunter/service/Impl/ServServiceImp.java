@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import team.legend.jobhunter.dao.PriceDao;
 import team.legend.jobhunter.dao.Resume_serviceDao;
 import team.legend.jobhunter.dao.Tutor_serviceDao;
 import team.legend.jobhunter.model.DO.ShowTeaDO;
 import team.legend.jobhunter.model.DO.TeaDO;
+import team.legend.jobhunter.model.PriceItem;
 import team.legend.jobhunter.service.ServService;
 import team.legend.jobhunter.utils.CommonUtil;
+import team.legend.jobhunter.utils.Constant;
 
 import java.util.*;
 
@@ -21,6 +24,8 @@ public class ServServiceImp implements ServService {
     Resume_serviceDao resumeServiceDao;
     @Autowired
     Tutor_serviceDao tutorServiceDao;
+    @Autowired
+    PriceDao priceDao;
 
 
     @Override
@@ -37,7 +42,7 @@ public class ServServiceImp implements ServService {
         List<ShowTeaDO> resumeInfo = resumeServiceDao.selectTeaInfo(pagesize,page);
 
         List<Map<String,Object>> dataList = new ArrayList<>();
-
+        PriceItem priceItem = priceDao.selectPriceByType(Constant.DEFAULT_PRICE_TYPE);
         for (ShowTeaDO showTeaDO:resumeInfo) {
             Map<String,Object> showTeaMap = new LinkedHashMap<>();
             String offorStr = showTeaDO.getTea_tag();
@@ -53,6 +58,8 @@ public class ServServiceImp implements ServService {
             showTeaMap.put("service_timestamp",showTeaDO.getService_timestamp());
             showTeaMap.put("service_status",showTeaDO.getService_status());
             showTeaMap.put("position",showTeaDO.getPosition());
+            showTeaMap.put("price",priceItem.getPrice());
+            showTeaMap.put("discount",priceItem.getDiscount());
             dataList.add(showTeaMap);
 
         }
@@ -75,7 +82,7 @@ public class ServServiceImp implements ServService {
         }
         List<ShowTeaDO> tutorInfo = tutorServiceDao.selectTeaInfo(pagesize,page);
         List<Map<String,Object>> dataList = new ArrayList<>();
-
+        PriceItem priceItem = priceDao.selectPriceByType(Constant.DEFAULT_PRICE_TYPE);
         for (ShowTeaDO showTeaDO:tutorInfo) {
             Map<String,Object> showTeaMap = new LinkedHashMap<>();
             String offorStr = showTeaDO.getTea_tag();
@@ -91,6 +98,8 @@ public class ServServiceImp implements ServService {
             showTeaMap.put("service_timestamp",showTeaDO.getService_timestamp());
             showTeaMap.put("service_status",showTeaDO.getService_status());
             showTeaMap.put("position",showTeaDO.getPosition());
+            showTeaMap.put("price",priceItem.getPrice());
+            showTeaMap.put("discount",priceItem.getDiscount());
             dataList.add(showTeaMap);
         }
 

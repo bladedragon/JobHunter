@@ -5,13 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team.legend.jobhunter.dao.FileDao;
 import team.legend.jobhunter.dao.PreOrderDao;
-import team.legend.jobhunter.dao.ShowPreOrderDao;
 import team.legend.jobhunter.dao.TeaDao;
 import team.legend.jobhunter.model.DO.FileDO;
 import team.legend.jobhunter.model.DO.OrderTeaDO;
 import team.legend.jobhunter.model.Detail;
 import team.legend.jobhunter.model.PreOrder;
-import team.legend.jobhunter.model.Teacher;
 import team.legend.jobhunter.service.ShowPreOrderService;
 import team.legend.jobhunter.utils.CommonUtil;
 
@@ -79,13 +77,13 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
             List<String> offerList = CommonUtil.toStrList(teacher.getTea_tag());
             List<FileDO> filePaths = fileDao.selectFilePath(preOrder.getPreorder_id());
             Detail detail = new Detail(teacher.getTea_nickname(),teacher.getTea_img_url(),teacher.getTea_gender(),
-                    teacher.getPosition(),teacher.getTea_company(),teacher.getIsonline(),offerList,teacher.getTea_description(),
+                    teacher.getPosition(),teacher.getTea_company(),preOrder.getIsonline(),offerList,teacher.getTea_description(),
                     preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),filePaths);
             map.put("detail",detail);
             mapList.add(map);
         }
 
-        System.out.println(mapList);
+
         return mapList;
     }
 }

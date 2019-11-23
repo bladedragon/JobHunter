@@ -23,10 +23,10 @@ spring:
 
 
 wxapi:
-  code2Session:
-  appid:
+  code2Session: https://api.weixin.qq.com/sns/jscode2session?
+  appid: wx969d9a910a1d1103
   appSecret:
-  get_accesstoken:
+  get_accesstoken: https://api.weixin.qq.com/cgi-bin/token?grant_type=
   mch_id:
   TRADETYPE:
   key:
