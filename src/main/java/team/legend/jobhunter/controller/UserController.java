@@ -8,26 +8,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.legend.jobhunter.exception.AuthorizeErrorException;
+import team.legend.jobhunter.exception.HttpReqException;
 import team.legend.jobhunter.exception.ParamErrorException;
 import team.legend.jobhunter.model.WXUser;
 import team.legend.jobhunter.service.UserService;
 import team.legend.jobhunter.utils.CommonUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
-@RestController("/wx")
+@RestController
 public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping(value = "/login",produces = "application/json;charset=UTF-8")
-    public String userLogin(@RequestBody JSONObject reqMsg) throws ParamErrorException, AuthorizeErrorException {
-
-        Map<String,Object> data = new HashMap<>();
+    @RequestMapping(value = "wx/login",produces = "application/json;charset=UTF-8")
+    public String userLogin(@RequestBody JSONObject reqMsg) throws ParamErrorException, AuthorizeErrorException{
+        log.info(">>request url: /wx/login");
+        log.info("new version");
+        Map<String,Object> data = new LinkedHashMap<>();
         String responseMsg = "success";
 
         if(!reqMsg.containsKey("code")){
@@ -83,12 +82,14 @@ public class UserController {
     }
 
     public static void main(String[] args) {
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> map1 = new HashMap<>();
-        map.put("test1","test1");
-        map1.put("map1","map1");
-        map1.put("map2",1);
-        map.put("map",map1);
-        System.out.println(CommonUtil.returnFormat(200,"lalal",map));
+//        Map<String,Object> map = new HashMap<>();
+//        Map<String,Object> map1 = new HashMap<>();
+//        map.put("test1","test1");
+//        map1.put("map1","map1");
+//        map1.put("map2",1);
+//        map.put("map",map1);
+//        System.out.println(CommonUtil.returnFormat(200,"lalal",map));
+    String str = "{\"nickName\":\"！！？\",\"gender\":0,\"language\":\"zh_CN\",\"city\":\"\",\"province\":\"\",\"country\":\"\",\"avatarUrl\":\"https://wx.qlogo.cn/mmopen/vi_32/wSkpLicAbWAx4rcvyhN6n6Q387uxXESXrXgwApTFr6x5o2ZjYqt7SplI1jXKRM3IbbMlCicULKaRjFtDXfQHhpJA/132\"}";
+        System.out.println(str);
     }
 }

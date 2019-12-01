@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team.legend.jobhunter.dao.WXDao;
 import team.legend.jobhunter.exception.ParamErrorException;
 import team.legend.jobhunter.exception.SqlErrorException;
+import team.legend.jobhunter.model.DO.WxTeaDO;
 import team.legend.jobhunter.model.Teacher;
 import team.legend.jobhunter.service.TeaInfoService;
 import team.legend.jobhunter.utils.CommonUtil;
@@ -24,6 +26,8 @@ import java.util.Map;
 public class TeaController {
     @Autowired
     TeaInfoService teaInfoService;
+    @Autowired
+    WXDao wxDao;
 
 
     @PostMapping(value = "/getTeaInfo",produces = "application/json;charset=UTF-8")
@@ -104,10 +108,11 @@ public class TeaController {
 
     @GetMapping("/code")
     public String getCode(String openid,String userid){
+
         String code = teaInfoService.getVerifyCode(openid,userid);
         return CommonUtil.returnFormat(200,"success",code);
     }
-    
+
     public static void main(String[] args) {
         Map<String,Object> map = new HashMap<>();
         List<String> offer = new ArrayList<>();

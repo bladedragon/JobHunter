@@ -24,6 +24,7 @@ public class Detail {
     private String stuExperience;
     private String stuGuidance;
     private List<FileDO> fileUrl;
+    private List<FileDO> teaFileUrl;
 
 
 

@@ -1,6 +1,18 @@
 spring:
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    password:
+    timeout: 500ms
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 2
+        max-active: 8
+        max-wait: 10000ms
   datasource:
-    hikari.c:
+    hikari:
       connection-init-sql: SET NAMES utf8mb4
 
     type: com.alibaba.druid.pool.DruidDataSource
@@ -24,3 +36,8 @@ spring:
         connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
         useGlobalDataSourceStat: true
         test-while-idle: true  #申请连接的时候检测，如果空闲时间大
+
+file:
+  imgUrl: D://test/
+  fileUrl: D://test/
+  defaultImgUrl: C:/Users/11566/Pictures/icons/布丁.png

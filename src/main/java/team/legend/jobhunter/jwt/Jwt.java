@@ -77,6 +77,8 @@ public class Jwt {
 
     public void initSecret(String key) {
         String text = SecretUtil.encodeBase64(getHeaderJSONStr()) + "." + SecretUtil.encodeBase64(getPayloadJSONStr());
+        log.info(">>log: header.get('alg'): {}",header.get("alg"));
+        log.info(">>log: text=> {}",text);
         signature = SecretUtil.encodeBase64(SecretUtil.jwtEncode(header.get("alg"), text, key));
     }
 

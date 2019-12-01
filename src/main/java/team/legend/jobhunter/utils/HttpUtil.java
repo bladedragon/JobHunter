@@ -1,5 +1,7 @@
 package team.legend.jobhunter.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -8,6 +10,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+@Slf4j
 public class HttpUtil {
 
     public static String httpPost(String body,String path){
@@ -99,6 +102,7 @@ public class HttpUtil {
             }
             response = buffer.toString();
         } catch (IOException e) {
+            log.error("request url :{} fail!",path);
             e.printStackTrace();
         }finally {
             try {

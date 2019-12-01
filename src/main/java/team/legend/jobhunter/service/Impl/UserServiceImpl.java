@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import team.legend.jobhunter.dao.WXDao;
 import team.legend.jobhunter.exception.AuthorizeErrorException;
+import team.legend.jobhunter.exception.HttpReqException;
 import team.legend.jobhunter.jwt.Jwt;
 import team.legend.jobhunter.jwt.JwtHelper;
 import team.legend.jobhunter.model.WXLogin;
@@ -41,36 +42,52 @@ public class UserServiceImpl implements UserService {
     WXDao wxDao;
 
     public Map<Integer,String> getSessionKey(String code) {
-        Map<Integer,String> result = new HashMap<>();
-        String code2SessionUrl = code2Session+appid+"&secret=" + secretId + "&js_code=" + code + "&grant_type=authorization_cde";
-        String res = HttpUtil.httpGet(code2SessionUrl);
-        JSONObject resJson = JSONObject.parseObject(res);
-        switch(resJson.getInteger("errcode")){
-            case -1:
-                log.error(">>login: errmsg:{}",resJson.getString("errmsg"));
-                result.put(-1,"系统繁忙，此时请开发者稍候再试");
-                result.put(-2,String.valueOf(resJson.getInteger("errcode")));
-                break;
-            case 40029:
-                log.error(">>login:errmsg:{}",resJson.getString("errmsg"));
-                result.put(-1,"code 无效");
-                result.put(-2,String.valueOf(resJson.getInteger("errcode")));
-                break;
-            case 45011:
-                log.error(">>login:errmsg:{}",resJson.getString("errmsg"));
-                result.put(-1,"频率限制，每个用户每分钟100次");
-                result.put(-2,String.valueOf(resJson.getInteger("errcode")));
-                break;
-            case 0:
-                result.put(0,resJson.getString("session_key"));
-                result.put(1,resJson.getString("openid"));
-                if(resJson.containsKey("unionid")){
-                    result.put(2,resJson.getString("unionid"));
+                Map<Integer,String> result = new HashMap<>(3);
+                String code2SessionUrl = code2Session+appid+"&secret=" + secretId + "&js_code=" + code + "&grant_type=authorization_code";
+
+                log.info(">>log:getsessionKey:do http request...");
+        String res = null;
+
+            res = HttpUtil.httpGet(code2SessionUrl);
+
+        log.info(">>log:>>getSessionKey : do http request done.");
+
+                JSONObject resJson = JSONObject.parseObject(res);
+                log.info("resJSON:{}",resJson);
+                if(resJson.containsKey("errcode")){
+                    switch(resJson.getInteger("errcode")){
+                        case -1:
+                            log.error(">>login: errmsg:{}",resJson.getString("errmsg"));
+                            result.put(-1,"系统繁忙，此时请开发者稍候再试");
+                            result.put(-2,String.valueOf(resJson.getInteger("errcode")));
+                            break;
+                        case 40029:
+                            log.error(">>login:errmsg:{}",resJson.getString("errmsg"));
+                            result.put(-1,"code 无效");
+                            result.put(-2,String.valueOf(resJson.getInteger("errcode")));
+                            break;
+                        case 45011:
+                            log.error(">>login:errmsg:{}",resJson.getString("errmsg"));
+                            result.put(-1,"频率限制，每个用户每分钟100次");
+                            result.put(-2,String.valueOf(resJson.getInteger("errcode")));
+                            break;
+                        case 0:
+                            result.put(0,resJson.getString("session_key"));
+                            result.put(1,resJson.getString("openid"));
+                            if(resJson.containsKey("unionid")){
+                                result.put(2,resJson.getString("unionid"));
+                            }
+                            break;
+                        default:
+                            throw new RuntimeException("请求失败");
+                    }
+                }else{
+                    result.put(0,resJson.getString("session_key"));
+                    result.put(1,resJson.getString("openid"));
+                    if(resJson.containsKey("unionid")){
+                        result.put(2,resJson.getString("unionid"));
+                    }
                 }
-                break;
-            default:
-                throw new RuntimeException("请求失败");
-        }
 
         return result;
     }
@@ -78,7 +95,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<Integer,String> login(String code) {
-        List<Object> loginList = new ArrayList<>();
+
         String user_id = null;
         Map<Integer,String> sessionMap = getSessionKey(code);
         WXLogin wxLogin = new WXLogin();
@@ -86,38 +103,50 @@ public class UserServiceImpl implements UserService {
         String date  = simpleDateFormat.format(new Date());
 
         if(sessionMap.containsKey(0)){
-            int rank = wxDao.getCount();
-            user_id = idGenerator.user_idEncode(sessionMap.get(0),sessionMap.get(1),rank);
-            wxLogin.setOpenid(sessionMap.get(1));
-            wxLogin.setSessionkey(sessionMap.get(0));
-            if(sessionMap.containsKey(2)){
-                wxLogin.setUnionid(sessionMap.get(2));
-            }else{
-                //防止jwt生成的参数出现null，导致无法生成jwt
-                wxLogin.setUnionid("");
-            }
+
             WXLogin login  = wxDao.selectByOpenid(sessionMap.get(1));
             if(login==null){
                 //新插入
+                //生成user_id
+
+                int rank = wxDao.getCount();
+                user_id = idGenerator.user_idEncode(sessionMap.get(0),sessionMap.get(1),rank);
+                wxLogin.setOpenid(sessionMap.get(1));
+                wxLogin.setSession_key(sessionMap.get(0));
+                if(sessionMap.containsKey(2)){
+                    wxLogin.setUnionid(sessionMap.get(2));
+                }else{
+                    //防止jwt生成的参数出现null，导致无法生成jwt
+                    wxLogin.setUnionid("");
+                }
+
                 wxLogin.setCreate_date(date);
                 wxDao.insertNewUser(wxLogin);
                 sessionMap.put(4,date);
                 sessionMap.put(5,date);
+                sessionMap.put(3,user_id);
             }else{
                 //更新最后登录时间和sessionkey
-                wxDao.updateLastLogin(date,sessionMap.get(0));
-                sessionMap.put(4,wxLogin.getCreate_date());
-                sessionMap.put(5,wxLogin.getLast_login());
-                String tea_id = wxLogin.getTea_id();
-                if(tea_id!=null || !tea_id.equals("")){
-                    sessionMap.put(10,tea_id);
+                wxDao.updateLastLogin(date,sessionMap.get(0),sessionMap.get(1));
+
+                sessionMap.put(3,login.getUser_id());
+                sessionMap.put(4,login.getCreate_date());
+                sessionMap.put(5,login.getLast_login());
+                String tea_id = login.getTea_id();
+                log.info("tea_id:{}",tea_id);
+                log.info("sesssionMap: {}",sessionMap);
+
+                if(null != tea_id && !tea_id.equals("")){
+                sessionMap.put(10,tea_id);
+                wxLogin.setWXLogin(login);
+                log.info("login again and show wxLogin: {}",wxLogin);
                 }
-            }
+        }
 
-            sessionMap.put(3,user_id);
 
-            Jwt jwt = null;
-            wxLoginJwtHelper.createJwt(wxLogin);
+
+            log.info(">>log: wxLogin: {}",wxLogin);
+            Jwt jwt = wxLoginJwtHelper.createJwt(wxLogin);
             log.info(">>log:code:[{}] id:[{}] openid:[{}] 校验成功", code, user_id,sessionMap.get(2));
             sessionMap.put(6,jwt.getJwtString());
 
@@ -181,7 +210,7 @@ public class UserServiceImpl implements UserService {
         @Override
         public Map<String,Object> getOldUserData(String user_id){
             WXUser wxUser = wxDao.selectUserByUserId(user_id);
-            Map<String,Object> wxUserMap = new HashMap<>();
+            Map<String,Object> wxUserMap = new LinkedHashMap<>();
             if(wxUser.getNickname()!=null&!wxUser.getNickname().equals("")){
                 wxUserMap.put("nickname",wxUser.getNickname());
                 wxUserMap.put("headimg_url",wxUser.getHeadimg_url());

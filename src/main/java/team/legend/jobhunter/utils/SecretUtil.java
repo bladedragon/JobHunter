@@ -29,9 +29,10 @@ public class SecretUtil {
      * @return
      */
     public static byte[] jwtEncode(String algorithm,String text,String secret){
-        Mac mac = null;
+        Mac mac  = null;
         try {
             mac = Mac.getInstance(algorithm);
+            log.info(">>log: mac=> {} ",mac);
             SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(),algorithm);
             mac.init(secretKey);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {

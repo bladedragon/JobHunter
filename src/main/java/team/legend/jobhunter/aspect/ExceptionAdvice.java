@@ -9,7 +9,7 @@ import team.legend.jobhunter.utils.Constant;
 
 import javax.servlet.http.HttpServletRequest;
 
-@RestControllerAdvice
+//@RestControllerAdvice
 @Slf4j
 public class ExceptionAdvice {
 
@@ -31,7 +31,13 @@ public class ExceptionAdvice {
             log.error(">>log: file upload fail,url:{}, message: {}",request.getRequestURI(),e.getMessage());
             return CommonUtil.returnFormatSimp(Constant.UPLOAD_ERROR,e.getMessage());
         }
+//        if(e.getClass() == HttpReqException.class){
+//            log.error(">>log: request url fail");
+//            return CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"request "+e.getMessage()+" fail !");
+//        }
         log.error(">>log: unKnow Exception ,message:{}",e.getMessage());
+        log.error("{}",e.getStackTrace());
         return CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"Unknow ERROR !");
+
     }
 }

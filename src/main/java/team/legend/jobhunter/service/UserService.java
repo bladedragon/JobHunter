@@ -1,6 +1,7 @@
 package team.legend.jobhunter.service;
 
 import team.legend.jobhunter.exception.AuthorizeErrorException;
+import team.legend.jobhunter.exception.HttpReqException;
 import team.legend.jobhunter.model.WXUser;
 
 import java.util.List;

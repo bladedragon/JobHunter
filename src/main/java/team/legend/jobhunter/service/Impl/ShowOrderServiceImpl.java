@@ -34,11 +34,11 @@ public class ShowOrderServiceImpl implements ShowOrderService {
 
         if(isTea == 1){
             orderList = orderDao.selectByTeaId(userId,isAccomplished,page,pagesize);
-            count = orderDao.getCountByTeaId(userId);
+            count = orderDao.getCountByTStatus(userId,isAccomplished);
 
         }else{
             orderList = orderDao.selectByStuId(userId,isAccomplished,page,pagesize);
-            count = orderDao.getCountByStuId(userId);
+            count = orderDao.getCountBySStatus(userId,isAccomplished);
 
         }
 
@@ -72,7 +72,7 @@ public class ShowOrderServiceImpl implements ShowOrderService {
             map.put("modifyTimestamp",order.getOrder_timestamp());
             if(isAccomplished == 0){
                 map.put("teaConfirm",order.getTea_confirm());
-                map.put("stuComfirm", order.getStu_confirm());
+                map.put("stuConfirm", order.getStu_confirm());
                 map.put("isConfirm",order.getOrder_comfirm());
             }
 
@@ -81,10 +81,11 @@ public class ShowOrderServiceImpl implements ShowOrderService {
 
 
             List<String> offerList = CommonUtil.toStrList(order.getTea_tag());
-            List<FileDO> filePaths = fileDao.selectFilePath(order.getOrder_id());
+            List<FileDO> filePaths = fileDao.selectFilePath(order.getOrder_id(),0);
+            List<FileDO> teaFiles = fileDao.selectFilePath(order.getOrder_id(),1);
             Detail detail = new Detail(order.getTea_nickname(),order.getTea_img_url(),order.getTea_gender(),
                     order.getPosition(), order.getTea_company(),order.getIsonline(),offerList,order.getTea_description(),
-                    order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths);
+                    order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths,teaFiles);
             map.put("detail",detail);
             mapList.add(map);
         }

@@ -2,6 +2,7 @@ package team.legend.jobhunter.service.Impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Select;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team.legend.jobhunter.dao.PriceDao;
@@ -42,8 +43,12 @@ public class ServServiceImp implements ServService {
         List<ShowTeaDO> resumeInfo = resumeServiceDao.selectTeaInfo(pagesize,page);
 
         List<Map<String,Object>> dataList = new ArrayList<>();
-        PriceItem priceItem = priceDao.selectPriceByType(Constant.DEFAULT_PRICE_TYPE);
+
+
         for (ShowTeaDO showTeaDO:resumeInfo) {
+            Map<String,Integer> prices = new HashMap<>(2);
+            Map<String,Integer> discounts = new HashMap<>(2);
+
             Map<String,Object> showTeaMap = new LinkedHashMap<>();
             String offorStr = showTeaDO.getTea_tag();
             List<String> tags = CommonUtil.toStrList(offorStr);
@@ -58,8 +63,33 @@ public class ServServiceImp implements ServService {
             showTeaMap.put("service_timestamp",showTeaDO.getService_timestamp());
             showTeaMap.put("service_status",showTeaDO.getService_status());
             showTeaMap.put("position",showTeaDO.getPosition());
-            showTeaMap.put("price",priceItem.getPrice());
-            showTeaMap.put("discount",priceItem.getDiscount());
+            switch (showTeaDO.getIsonline()){
+                case 1:
+                    PriceItem priceItem = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
+                    prices.put("offlinePrice",priceItem.getPrice());
+                    discounts.put("onlineDiscount",priceItem.getDiscount());
+                    break;
+                case 2:
+                    PriceItem priceItem1 = priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
+                    prices.put("onlinePrice",priceItem1.getPrice());
+                    discounts.put("offlineDiscount",priceItem1.getDiscount());
+                    break;
+                case 0:
+                    PriceItem priceItem2 = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
+                    PriceItem priceItem3 =priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
+                    prices.put("onlinePrice",priceItem3.getPrice());
+                    prices.put("offlinePrice",priceItem2.getPrice());
+                    discounts.put("onlineDiscount",priceItem3.getDiscount());
+                    discounts.put("offlineDiscount",priceItem2.getDiscount());
+                    break;
+                default:
+                    prices.put("ErrorPrice",Constant.INFINITE_PRICE);
+                    discounts.put("EeeorDiscount",0);
+                    log.error(">>log: price select met exception when ger isOnline: [{}]",showTeaDO.getIsonline());
+                    break;
+            }
+            showTeaMap.put("price",prices);
+            showTeaMap.put("discount",discounts);
             dataList.add(showTeaMap);
 
         }
@@ -82,8 +112,12 @@ public class ServServiceImp implements ServService {
         }
         List<ShowTeaDO> tutorInfo = tutorServiceDao.selectTeaInfo(pagesize,page);
         List<Map<String,Object>> dataList = new ArrayList<>();
-        PriceItem priceItem = priceDao.selectPriceByType(Constant.DEFAULT_PRICE_TYPE);
+
         for (ShowTeaDO showTeaDO:tutorInfo) {
+
+            Map<String,Integer> prices = new HashMap<>(2);
+            Map<String,Integer> discounts = new HashMap<>(2);
+
             Map<String,Object> showTeaMap = new LinkedHashMap<>();
             String offorStr = showTeaDO.getTea_tag();
             List<String> tags = CommonUtil.toStrList(offorStr);
@@ -98,8 +132,34 @@ public class ServServiceImp implements ServService {
             showTeaMap.put("service_timestamp",showTeaDO.getService_timestamp());
             showTeaMap.put("service_status",showTeaDO.getService_status());
             showTeaMap.put("position",showTeaDO.getPosition());
-            showTeaMap.put("price",priceItem.getPrice());
-            showTeaMap.put("discount",priceItem.getDiscount());
+
+            switch (showTeaDO.getIsonline()){
+                case 1:
+                    PriceItem priceItem = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
+                    prices.put("offlinePrice",priceItem.getPrice());
+                    discounts.put("onlineDiscount",priceItem.getDiscount());
+                    break;
+                case 2:
+                    PriceItem priceItem1 = priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
+                    prices.put("onlinePrice",priceItem1.getPrice());
+                    discounts.put("offlineDiscount",priceItem1.getDiscount());
+                    break;
+                case 0:
+                    PriceItem priceItem2 = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
+                    PriceItem priceItem3 =priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
+                    prices.put("onlinePrice",priceItem3.getPrice());
+                    prices.put("offlinePrice",priceItem2.getPrice());
+                    discounts.put("onlineDiscount",priceItem3.getDiscount());
+                    discounts.put("offlineDiscount",priceItem2.getDiscount());
+                    break;
+                default:
+                    prices.put("ErrorPrice",Constant.INFINITE_PRICE);
+                    discounts.put("EeeorDiscount",0);
+                    log.error(">>log: price select met exception when ger isOnline: [{}]",showTeaDO.getIsonline());
+                    break;
+            }
+            showTeaMap.put("price",prices);
+            showTeaMap.put("discount",discounts);
             dataList.add(showTeaMap);
         }
 

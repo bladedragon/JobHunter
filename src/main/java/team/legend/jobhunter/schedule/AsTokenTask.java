@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import team.legend.jobhunter.exception.HttpReqException;
 import team.legend.jobhunter.utils.AccessTokenHelper;
 import team.legend.jobhunter.utils.HttpUtil;
 
@@ -21,7 +22,7 @@ public class AsTokenTask {
     @Value("${wxapi.get_accesstoken}")
     private String get_accesstoken_url;
 
-    @Scheduled(fixedDelay = 7180000)
+//    @Scheduled(fixedDelay = 7180000)
     public String getAccessTokenFromURL() {
         String access_token = null;
         String grant_type = "client_credential";

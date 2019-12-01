@@ -129,6 +129,10 @@ public class OrderServiceImpl implements OrderService {
                 throw new SqlErrorException("teacher is null");
             }
             log.info("show orderId[{}]",order_id);
+
+            //TODO: 完善价格逻辑，将填写价格和后台老师提供的价格进行匹配，如果价格不匹配器，订单无效
+
+
             int num = orderDao.insertOrder(new Order(order_id, preOrder.getTea_id(), preOrder.getStu_id(), preOrder.getDiscount(), preOrder.getPrice(),
                     preOrder.getOrder_type(), 1, preOrder.getIsonline(), preOrder.getRequirement(), preOrder.getExperience(), preOrder.getTele(),
                     preOrder.getRealname(),teacher.getTea_nickname(),teacher.getTea_tele(),teacher.getTea_tag(),
@@ -165,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = IOException.class)
-    public int uploadFile(List<MultipartFile> files, String orderId) throws UploadException {
+    public int uploadFile(List<MultipartFile> files, String orderId,int isTea) throws UploadException {
 
             int failNum = 0;
 
@@ -185,7 +189,7 @@ public class OrderServiceImpl implements OrderService {
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(orderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1,originFileName);
+                    int num = fileDao.insertFileUrl(orderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -198,21 +202,21 @@ public class OrderServiceImpl implements OrderService {
 
     public static void main(String[] args) {
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("preOrderId","802019111120142514572492369");
-        map.put("stuId","1111");
-        map.put("teaId","11111");
-        map.put("serviceId","sadfsdfsdf");
-        map.put("orderType","resume");
-        map.put("realName","蒋龙");
-        map.put("tele","123454654");
-        map.put("experience","这是一段经历，大概要写好些话");
-        map.put("guidance","这是用户的需求，以及渴望得到的指导");
-        map.put("isonline",1);
-        map.put("price",20000);
-        map.put("discount",98);
-        map.put("isUploadFile",1);
-
-        System.out.println(JSON.toJSONString(map));
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("preOrderId","802019111120142514572492369");
+//        map.put("stuId","1111");
+//        map.put("teaId","11111");
+//        map.put("serviceId","sadfsdfsdf");
+//        map.put("orderType","resume");
+//        map.put("realName","蒋龙");
+//        map.put("tele","123454654");
+//        map.put("experience","这是一段经历，大概要写好些话");
+//        map.put("guidance","这是用户的需求，以及渴望得到的指导");
+//        map.put("isonline",1);
+//        map.put("price",20000);
+//        map.put("discount",98);
+//        map.put("isUploadFile",1);
+//
+//        System.out.println(JSON.toJSONString(map));
     }
 }

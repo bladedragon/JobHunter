@@ -10,17 +10,17 @@ import team.legend.jobhunter.model.WXUser;
 @Configuration
 public class JwtConfig {
 
-//    @Value("${jwt.algorithm}")
+
     private static final String ALGORITHM = "HmacSHA256";
     private static final String ISS = "legend";
     private static final String SUB = "WeixinUser";
     private static final String AUD = "student";
 
     @Value("${jwt.secretKey}")
-    private static String secretKey;
+    private String secretKey;
 
     @Value("${jwt.effectiveTime}")
-    private static long effectiveTime;
+    private long effectiveTime;
 
 
     @Bean("wxJwtHelper")

@@ -84,7 +84,7 @@ public class OrderController {
                 map.put("failNum",1);
                 return CommonUtil.returnFormat(Constant.FAIL_UPLOAD,"success but failUpload",map);
             }
-             num = orderService.uploadFile(files, (String) map.get("orderId"));
+             num = orderService.uploadFile(files, (String) map.get("orderId"),Constant.STU_FILE);
         }
 
 

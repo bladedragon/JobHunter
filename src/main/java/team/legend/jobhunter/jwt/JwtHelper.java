@@ -1,11 +1,12 @@
 package team.legend.jobhunter.jwt;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import team.legend.jobhunter.utils.SecretUtil;
 
 import java.lang.reflect.Field;
 
-
+@Slf4j
 public class JwtHelper<T> {
     private String iss;
 
@@ -60,6 +61,7 @@ public class JwtHelper<T> {
             }
 
         }
+        log.info(">>log: jwt.initSecret:=> secretKey = {}",secretKey);
         jwt.initSecret(secretKey);
 
         return jwt;

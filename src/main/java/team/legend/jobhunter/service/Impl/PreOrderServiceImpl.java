@@ -100,7 +100,7 @@ public class PreOrderServiceImpl implements PreOrderService {
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),1,originFileName);
+                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
 
                 } catch (IOException e) {
                     e.printStackTrace();

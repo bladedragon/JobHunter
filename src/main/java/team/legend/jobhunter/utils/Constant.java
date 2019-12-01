@@ -7,12 +7,19 @@ public class Constant {
 //    public static final int MALE = 1 ;
 //    public static final int FEMALE = 2;
 //    public static final int UNKNOW = 0;
-    public static final int DEFAULT_PRICE_TYPE  =1;
-
+    //线上线下状态
+    public static final int ONLINE_PRICE_STATUS  =1;
+    public static final int OFFLINE_PRICE_STATUS = 2;
+    public static final int INFINITE_PRICE = 999999999;
+    //锁过期时间
     public static final long LOCK_EXPIRE_TIME = 5000;
+    //预订单过期时间
     public static final int  PREORDER_EXPIRE_DAY = 3;
-
+    //最大文件传输大小
     public static final long MAX_FILE_SIZE = 15*1024*1000;
+    //文件类型
+    public static final int STU_FILE = 0;
+    public static final int TEA_FILE = 1;
 
     //特殊成功码
     public static final int EMPTY_CODE = 201;
