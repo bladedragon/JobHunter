@@ -3,7 +3,7 @@ package team.legend.jobhunter.service.Impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Options;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -36,6 +36,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
     @Value("${file.imgUrl}")
     private String imgUrl;
+    @Value("${file.webImgUrl}")
+    private String webImgUrl;
 
     @Autowired
     TeaDao teaDao;
@@ -58,9 +60,11 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
         if(null != headImg ){
             String originFileName = headImg.getOriginalFilename().toLowerCase();
+            log.info("originFileName:{}",headImg.getOriginalFilename());
             String[] strs = originFileName.split("\\.");
-            String fileSuffix = strs[1] ;
+            String fileSuffix = strs[strs.length-1] ;
             String preStr = tea_id;
+            log.info("img's suffix is {}",fileSuffix);
             for (String suffix : Constant.ALLOW_IMG_SUFFIXS) {
                 if(fileSuffix.equals(suffix)){
                     String preName = SecretUtil.MD5Encode(preStr);
@@ -69,10 +73,11 @@ public class TeaInfoServiceImpl implements TeaInfoService {
                     String imgFullUrl = imgUrl+fileFullName;
                     File dir = new File(imgUrl+tea_id);
                     dir.mkdirs();
+                    log.info("imgUrlFile:{}",imgFullUrl);
                     File file = new File(imgFullUrl);
                     try {
                         headImg.transferTo(file);
-                        teaDao.uploadImg(tea_id,imgFullUrl);
+                        teaDao.uploadImg(tea_id,webImgUrl+fileFullName);
                         return imgFullUrl;
                     } catch (IOException e) {
                         log.error(">>log: img  upload fail!!");
@@ -122,22 +127,26 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
         for(int i =0;i<serviceTypeArray.size();i++){
             if(i!=0){
-                serviceTypes += ":";
-            }
-            if(serviceTypeArray.get(i).equals("resume")){
-                flag += 10;
-                System.out.println("插入resume");
-            }
-            if(serviceTypeArray.get(i).equals("tutor")){
-                flag +=1;
-                System.out.println("插入tutor");
-            }
-            serviceTypes += serviceTypeArray.getString(i);
-            System.out.println(serviceTypeArray.get(i));
+            serviceTypes += ":";
         }
+        if(serviceTypeArray.get(i).equals("resume")){
+            flag += 10;
+            System.out.println("插入resume");
+        }
+        if(serviceTypeArray.get(i).equals("tutor")){
+            flag +=1;
+            System.out.println("插入tutor");
+        }
+        serviceTypes += serviceTypeArray.getString(i);
+        System.out.println(serviceTypeArray.get(i));
+    }
 
+        if(img_url == null || img_url.equals("null")){
+            int num =teaDao.updateTeaWithoutImg(teaId,nickname,teles,perDes,offers,company,position,serviceTypes,isOnline);
+        }else{
+            int num = teaDao.updateTea(new TeaDO(teaId,nickname,img_url,teles,"",perDes,offers,company,position,serviceTypes,isOnline));
+        }
         //老师真实姓名不能更新
-        int num = teaDao.updateTea(new TeaDO(teaId,nickname,img_url,teles,"",perDes,offers,company,position,serviceTypes,isOnline));
         Teacher teacher = teaDao.selectByTeaId(teaId);
         if(teacher != null){
             List<String> teleList = CommonUtil.toStrList(teacher.getTea_tele());
@@ -171,7 +180,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
                 break;
             case 1:
                 String tutor_id = idGenerator.createServiceId(teaId);
-                tutorServiceDao.insertTutor(new TeaInfoDo(teacher,tutor_id,System.currentTimeMillis()/1000,0));
+                tutorServiceDao.insertTutor(new TeaInfoDo(teacher,tutor_id,System.currentTimeMillis(),0));
                 String sid1 = resumeServiceDao.selectServiceId(teaId);
                 if(sid1!= null && !sid1.equals("")){
                     resumeServiceDao.deleteResume(teaId);
@@ -179,7 +188,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
                 break;
             case 10:
                 String resume_id = idGenerator.createServiceId(teaId);
-                resumeServiceDao.inertResume(new TeaInfoDo(teacher,resume_id,System.currentTimeMillis()/1000,0));
+                resumeServiceDao.inertResume(new TeaInfoDo(teacher,resume_id,System.currentTimeMillis(),0));
                 String sid2 = tutorServiceDao.selectServiceId(teaId);
                 System.out.println(sid2);
                 if(sid2 != null && !sid2.equals("")){
@@ -189,8 +198,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
             case 11:
                 //重复修改会生成同样的service_id，因此插入才会覆盖
                 String service_id = idGenerator.createServiceId(teaId);
-                tutorServiceDao.insertTutor(new TeaInfoDo(teacher,service_id,System.currentTimeMillis()/1000,0));
-                resumeServiceDao.inertResume(new TeaInfoDo(teacher,service_id,System.currentTimeMillis()/1000,0));
+                tutorServiceDao.insertTutor(new TeaInfoDo(teacher,service_id,System.currentTimeMillis(),0));
+                resumeServiceDao.inertResume(new TeaInfoDo(teacher,service_id,System.currentTimeMillis(),0));
                 break;
             default:
                 log.error("log>>[{}] service type is not allowed,which is ["+flag+"]",teaId);
@@ -205,7 +214,6 @@ public class TeaInfoServiceImpl implements TeaInfoService {
        @Override
     public Map<String, Object> getTeaInfo(String teaId) {
         Map<String,Object> teaMap = new HashMap<>(5);
-           System.out.println(teaId);
         Teacher teacher = teaDao.selectByTeaId(teaId);
            if(teacher != null){
                List<String> teleList = CommonUtil.toStrList(teacher.getTea_tele());
@@ -248,8 +256,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         String sign = openid+userId;
         String encodeStr = SecretUtil.shaCheck(openid,userId);
         String originStr = sign +encodeStr;
-        String finalStr = SecretUtil.MD5Encode(originStr).toUpperCase();
-        String teaId = null;
+        String finalStr = SecretUtil.MD5Encode(originStr).toUpperCase().substring(5,15);
+        String teaId = "";
         int num = 0;
         int result = 0;
 
@@ -273,6 +281,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         }
     }
 
+
     @Override
     public Map<String, Object> getTeaHome(String teaId) {
 
@@ -283,12 +292,12 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         int ordersNum = orderDao.getCountByTeaId(teaId);
 
         Teacher teacher = teaDao.selectByTeaId(teaId);
-        List<String> teaOfferList = CommonUtil.toStrList(teacher.getTea_tag());
+        List<String> teaTypeList = CommonUtil.toStrList(teacher.getTea_type());
         result.put("orderNum",ordersNum);
         result.put("accomplishedNum",accomplishNum);
         result.put("servingNum",ordersNum-accomplishNum);
-        result.put("teacher",new TeaHomeInfo(teaId,teacher.getTea_nickname(),teacher.getTea_company(),
-                teacher.getIsonline(),teaOfferList));
+        result.put("teacher",new TeaHomeInfo(teaId,teacher.getTea_nickname(),
+                teacher.getIsonline(),teaTypeList,teacher.getTea_img_url(),teacher.getTea_tele()));
 
         //显示前六条数据，不判断是否是今天
         List<Order>  orders = orderDao.selectNowDayOrder(teaId,6);
@@ -344,13 +353,13 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         String sign = openid+userId;
         String encodeStr = SecretUtil.shaCheck(openid,userId);
         String orignStr = sign+encodeStr;
-        String finalStr = SecretUtil.MD5Encode(orignStr).toUpperCase();
+        String finalStr = SecretUtil.MD5Encode(orignStr).toUpperCase().substring(5,15);
         return finalStr;
     }
 
     public static void main(String[] args) {
         TeaInfoServiceImpl teaInfoService = new TeaInfoServiceImpl();
-        String code = teaInfoService.getVerifyCode("qazwsxedc","zzz123456");
+        String code = teaInfoService.getVerifyCode("oYujX5Riw4pu8xy_3pAguP7cx6_A","D210752226");
         System.out.println(code);
     }
 }

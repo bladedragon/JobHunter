@@ -7,12 +7,13 @@ import team.legend.jobhunter.dao.EvaluateDao;
 import team.legend.jobhunter.dao.LoveDao;
 import team.legend.jobhunter.dao.OfferDao;
 import team.legend.jobhunter.model.LoveItem;
-import team.legend.jobhunter.model.Offer;
+
 import team.legend.jobhunter.model.OfferInfo;
 import team.legend.jobhunter.service.OfferService;
 
 import java.text.SimpleDateFormat;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -52,4 +53,23 @@ public class OfferServiceImpl implements OfferService {
 
          return result;
     }
+
+    @Override
+    public List<OfferInfo> getOfferList(int page,int pagesize) {
+        List<OfferInfo> offerInfos = offerDao.selectOfferInfo(pagesize,page);
+            if(offerInfos != null &&!offerInfos.isEmpty()){
+                return offerInfos;
+            }
+
+        return null;
+    }
+
+    @Override
+    public List<OfferInfo> refreshOfferList(int page, int pagesize) {
+
+
+        return null;
+    }
+
+
 }

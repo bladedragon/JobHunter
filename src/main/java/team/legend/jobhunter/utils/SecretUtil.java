@@ -32,7 +32,7 @@ public class SecretUtil {
         Mac mac  = null;
         try {
             mac = Mac.getInstance(algorithm);
-            log.info(">>log: mac=> {} ",mac);
+
             SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(),algorithm);
             mac.init(secretKey);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
@@ -114,15 +114,16 @@ public class SecretUtil {
         return Base64.getEncoder().encodeToString(encode);
     }
 
-    public static String shaCheck(String rawData,String signature){
+    public static String shaCheck(String rawData,String sessionKey){
 
-        String encodeStr = rawData+signature;
+        String encodeStr = rawData+sessionKey;
 
         try {
-            MessageDigest sha = MessageDigest.getInstance("SHA");
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
             sha.update(encodeStr.getBytes());
             byte[] shaBin= sha.digest();
-            return new String(shaBin, StandardCharsets.UTF_8);
+
+            return getFormattedText(shaBin);
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -131,14 +132,29 @@ public class SecretUtil {
 
     }
 
+    private static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
+            'e', 'f' };
+
+    private static String getFormattedText(byte[] bytes) {
+        int len = bytes.length;
+        StringBuilder buf = new StringBuilder(len * 2);
+        // 把密文转换成十六进制的字符串形式
+        for (int j = 0; j < len; j++) {
+            buf.append(HEX_DIGITS[(bytes[j] >> 4) & 0x0f]);
+            buf.append(HEX_DIGITS[bytes[j] & 0x0f]);
+        }
+        return buf.toString();
+    }
+
 
     public static void main(String[] args) {
 
 //        byte[] bytes= jwtEncode("HmacSHA256","text","ICT_TEAM");
 //        System.out.println(encodeBase64(bytes));
 //        System.out.println(System.currentTimeMillis()/1000);
-
-
+        String rawData = "{\"nickName\":\"！！？\",\"gender\":0,\"language\":\"zh_CN\",\"city\":\"\",\"province\":\"\",\"country\":\"\",\"avatarUrl\":\"https://wx.qlogo.cn/mmopen/vi_32/wSkpLicAbWAx4rcvyhN6n6Q387uxXESXrXgwApTFr6x5o2ZjYqt7SplI1jXKRM3IbbMlCicULKaRjFtDXfQHhpJA/132\"}";
+        String sign = "51dbdb4a8ff94545ce2e1e264c6547ae47d6028e";
+        System.out.println(shaCheck(rawData,sign));
 
     }
 }

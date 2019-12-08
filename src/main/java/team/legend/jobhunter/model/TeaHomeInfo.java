@@ -10,7 +10,10 @@ import java.util.List;
 public class TeaHomeInfo {
     private String  teaId;
     private String teaName;
-    private String company;
+//    private String company;
     private int  isOnline;
-    private List<String> offer;
+//    private List<String> offer;
+    private List<String> serviceType;
+    private String imgUrl;
+    private String tele;
 }

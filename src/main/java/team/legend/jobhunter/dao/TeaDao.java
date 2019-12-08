@@ -31,6 +31,15 @@ public interface TeaDao {
             "WHERE tea_id = #{tea_id}")
     int updateTea(TeaDO teaDo);
 
+    @Update("UPDATE teacher SET tea_nickname = #{tea_nickname},tea_tele = #{tea_tele}, " +
+            "tea_description = #{tea_description}, tea_tag = #{tea_tag}, tea_company = #{tea_company}," +
+            "position = #{position}, tea_type = #{tea_type}, isonline = #{isonline} " +
+            "WHERE tea_id = #{tea_id}")
+    int updateTeaWithoutImg(@Param("tea_id") String teaId,@Param("tea_nickname") String nickname,@Param("tea_tele") String teles,
+                            @Param("tea_description") String perDes,@Param("tea_tag")String offers,
+                            @Param("tea_company")String company,@Param("position")String position,
+                            @Param("tea_type")String serviceTypes,@Param("isonline") Integer isOnline);
+
     @Insert("INSERT INTO teacher(tea_id,tea_nickname,tea_img_url,tea_gender,tea_realname,verify_code) " +
             "VALUES(#{tea_id},#{tea_nickname},#{tea_img_url},#{tea_gender},#{tea_realname},#{verify_code})")
     int insertTea(String tea_id,String tea_nickname,String tea_img_url,int tea_gender,@Param("tea_realname") String realname,String verify_code);

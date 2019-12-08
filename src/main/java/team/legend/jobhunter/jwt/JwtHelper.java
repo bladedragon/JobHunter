@@ -50,33 +50,39 @@ public class JwtHelper<T> {
             jwt.setParameter("sub",sub);
         }
         if(t != null) {
-            Field[] fields = t.getClass().getFields();
+            Field[] fields = t.getClass().getDeclaredFields();
+            log.info(">>log: fields :{}",fields);
             try {
                 for (Field field : fields) {
                     field.setAccessible(true);
                     jwt.setParameter(field.getName(), String.valueOf(field.get(t)));
+//                    log.info("jwt.setParameter({} ,, {});",field.getName(),String.valueOf(field.get(t)));
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
 
         }
-        log.info(">>log: jwt.initSecret:=> secretKey = {}",secretKey);
+
         jwt.initSecret(secretKey);
 
         return jwt;
     }
 
     public boolean isAuthorize(Jwt jwt){
+//        log.info("isA: head:{}",jwt.getHeaderJSONStr());
         String headerJson = jwt.getHeaderJSONStr();
+//        log.info("isA:pay:{}",jwt.getPayloadJSONStr());
         String playloadJson = jwt.getPayloadJSONStr();
         String secret = jwt.getSignature();
 
         String encodeHeader = SecretUtil.encodeBase64(headerJson);
         String encodePlayload = SecretUtil.encodeBase64(playloadJson);
-        String text = encodeHeader + "." + encodePlayload;
-        String encodeText = SecretUtil.encodeBase64(SecretUtil.jwtEncode(algorithm, secretKey, text));
+        String text = SecretUtil.encodeBase64(encodeHeader + "." + encodePlayload);
 
+        String encodeText = SecretUtil.encodeBase64(SecretUtil.jwtEncode(algorithm, text,secretKey));
+//        log.info("encodeText:{}",encodeText);
+//        log.info("secret:{}",secret);
         return encodeText.equals(secret);
 
     }

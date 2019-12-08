@@ -2,11 +2,13 @@ package team.legend.jobhunter.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 public class CommonUtil {
 
     public static String returnFormat(int code, String msg, Object data) {
@@ -44,9 +46,13 @@ public class CommonUtil {
     }
 
     public static List<String> toStrList(String str){
-        String[] strs = str.split(":");
-        List<String> strList = Arrays.asList(strs);
-        return strList;
+
+        if(str != null){
+            String[] strs = str.split(":");
+            List<String> strList = Arrays.asList(strs);
+            return strList;
+        }
+        return null;
     }
 
 

@@ -35,7 +35,7 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
         List<Map<String,Object>> mapList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         List<PreOrder> preOrderList = preOrderDao.selectByStuId(userId);
-
+        System.out.println(preOrderList);
         for (PreOrder preOrder: preOrderList) {
             Map<String ,Object> map = new LinkedHashMap<>();
             map.put("preOrderId",preOrder.getPreorder_id());
@@ -43,7 +43,9 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
             map.put("stuId",preOrder.getStu_id());
             map.put("orderDate",preOrder.getCreate_date());
             if(preOrder.getExpire()-System.currentTimeMillis()/1000< 0){
+//                preOrderDao.deletePreOrder(preOrder.getPreorder_id());
                 map.put("isExpire",1);
+                mapList.add(map);
                 continue;
             }else{
                 map.put("isExpire",0);
@@ -82,9 +84,10 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
                     preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),filePaths,null);
             map.put("detail",detail);
             mapList.add(map);
+
         }
 
-
+        System.out.println(mapList);
         return mapList;
     }
 }

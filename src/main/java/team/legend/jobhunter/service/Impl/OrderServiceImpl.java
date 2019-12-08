@@ -31,6 +31,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${file.fileUrl}")
     String fileUrl;
+    @Value("${file.webFileUrl}")
+    String webFileUrl;
     @Autowired
     PreOrderDao preOrderDao;
     @Autowired
@@ -180,16 +182,16 @@ public class OrderServiceImpl implements OrderService {
                 String originFileName = file.getOriginalFilename();
                 String[] strs = originFileName.split("\\.");
                 String fileSuffix = strs[1];
-                String preName = SecretUtil.MD5Encode(orderId).substring(0, 5);
-                String fileName = preName + CommonUtil.getNowTime();
-                String fileFullName = fileName + "." + fileSuffix;
-                String fileFullUrl = fileUrl + orderId.substring(0,5)+"/"+fileFullName;
+                String preName = SecretUtil.MD5Encode(orderId).substring(0, 10);
+                String fileName = preName +"." + fileSuffix ;
+                String fileFullName = orderId.substring(0,5)+"/"+fileName;
+                String fileFullUrl = fileUrl +fileFullName;
                 File dir = new File(fileUrl+orderId.substring(0,5));
                 dir.mkdirs();
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(orderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
+                    int num = fileDao.insertFileUrl(orderId, webFileUrl+fileFullName, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
 
                 } catch (IOException e) {
                     e.printStackTrace();

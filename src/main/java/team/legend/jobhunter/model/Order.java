@@ -56,7 +56,7 @@ public class Order {
         this.appoint_timestamp = null;
         this.order_comfirm = null;
         this.order_date = CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss");
-        this.order_timestamp = System.currentTimeMillis()/1000;
+        this.order_timestamp = System.currentTimeMillis();
         this.tea_confirm = null;
         this.stu_confirm = null;
 

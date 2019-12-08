@@ -17,6 +17,7 @@ public class OfferInfo {
     private String offer_post_way;
     private String offer_salary;
     private Long  update_timestamp;
+    private String logo;
 
     OfferInfo(String offer_id,String offer_name,String offer_requirement,String offer_location,
               String offer_company_name,String offer_type,String offer_description,String offer_post_way,

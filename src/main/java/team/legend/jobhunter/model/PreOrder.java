@@ -49,7 +49,7 @@ public class PreOrder {
         this.order_type = order_type;
         this.price = price;
         this.discount = discount;
-        this.timestamp = System.currentTimeMillis()/1000;
+        this.timestamp = System.currentTimeMillis();
 
     }
 }

@@ -2,6 +2,7 @@ package team.legend.jobhunter.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,11 @@ public class ShowOfferController {
 
     @Autowired
     OfferService offerService;
+
+    @GetMapping(value = "/getOfferHome",produces = "application/json;charset=UTF-8")
+    public String getOfferList(@RequestBody JSONObject jsonObject){
+        return null;
+    }
 
     @PostMapping(value = "/getdetail",produces = "application/json;charset=UTF-8")
     public String evaluate(@RequestBody JSONObject jsonObject){
@@ -34,7 +40,6 @@ public class ShowOfferController {
 
         }
         return CommonUtil.returnFormat(200,"success",result);
-
 
     }
 }

@@ -48,16 +48,22 @@ public class TeaController {
 
 
 
-    @PostMapping(value = "/modifyTeaInfo",produces ="application/json;charset=UTF-8")
+    @PostMapping(value = "/modifyTeaInfo",produces = "application/json;charset=UTF-8")
     public String updateInfo(@RequestParam(value = "headImg",required=false) MultipartFile headImg, @RequestParam("jsonStr") String jsonStr) throws ParamErrorException {
+        log.info("/modifyTeaInfo:jsonStr:{}",jsonStr);
         JSONObject reqMsg = JSONObject.parseObject(jsonStr);
-
+        String imgUrl = null;
         String teaId = reqMsg.getString("teaId");
         if(teaId ==null){
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param is error");
         }
 
-        String imgUrl = teaInfoService.saveImg(teaId,headImg);
+        if(headImg != null){
+            log.info(">>headImg is not null");
+             imgUrl = teaInfoService.saveImg(teaId,headImg);
+        }
+
+        log.info("headImg = {},isEmpty?{}",imgUrl,headImg);
         Map<String,Object>  teaInfo = teaInfoService.modifyInfo(reqMsg,imgUrl);
 
         if(teaInfo !=null){

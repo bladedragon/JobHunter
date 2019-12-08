@@ -58,10 +58,7 @@ public class PreOrderController {
         Map<String, String> map = preOrderService.createPreOrder(jsonObject);
         redisLockHelper.unlock(lock_id,lockTimestamp);
         log.error("-----w------l----------{}-----------------------",System.currentTimeMillis()-now);
-        //判断订单是否超时
-        if(map.containsKey("overTime")){
-            return  CommonUtil.returnFormatSimp(Constant.ERROR_ORDER_OVERTIME,"preOrder is overTime");
-        }
+
 
         String preOrderId = map.get("preOrderId");
 
@@ -80,6 +77,10 @@ public class PreOrderController {
             return CommonUtil.returnFormat(Constant.FAIL_UPLOAD,"success but failUpload",result);
         }
 
+        //判断订单是否超时
+        if(map.containsKey("overTime")){
+            return  CommonUtil.returnFormat(203,"preOrder is overTime but new has created",result);
+        }
         return CommonUtil.returnFormat(code,"success",result);
     }
 

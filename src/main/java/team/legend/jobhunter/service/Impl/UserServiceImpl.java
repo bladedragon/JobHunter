@@ -20,6 +20,8 @@ import team.legend.jobhunter.utils.SecretUtil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static sun.security.x509.CertificateAlgorithmId.ALGORITHM;
+
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
@@ -111,6 +113,7 @@ public class UserServiceImpl implements UserService {
 
                 int rank = wxDao.getCount();
                 user_id = idGenerator.user_idEncode(sessionMap.get(0),sessionMap.get(1),rank);
+                wxLogin.setUser_id(user_id);
                 wxLogin.setOpenid(sessionMap.get(1));
                 wxLogin.setSession_key(sessionMap.get(0));
                 if(sessionMap.containsKey(2)){
@@ -121,10 +124,13 @@ public class UserServiceImpl implements UserService {
                 }
 
                 wxLogin.setCreate_date(date);
+                log.info("before insert wxlogin:{}",wxLogin);
                 wxDao.insertNewUser(wxLogin);
                 sessionMap.put(4,date);
                 sessionMap.put(5,date);
                 sessionMap.put(3,user_id);
+
+
             }else{
                 //更新最后登录时间和sessionkey
                 wxDao.updateLastLogin(date,sessionMap.get(0),sessionMap.get(1));
@@ -133,44 +139,49 @@ public class UserServiceImpl implements UserService {
                 sessionMap.put(4,login.getCreate_date());
                 sessionMap.put(5,login.getLast_login());
                 String tea_id = login.getTea_id();
-                log.info("tea_id:{}",tea_id);
-                log.info("sesssionMap: {}",sessionMap);
 
                 if(null != tea_id && !tea_id.equals("")){
                 sessionMap.put(10,tea_id);
+                //teaId 覆盖老师原有的userId
+//                sessionMap.put(3,tea_id);
+
                 wxLogin.setWXLogin(login);
-                log.info("login again and show wxLogin: {}",wxLogin);
+
                 }
         }
-
-
-
-            log.info(">>log: wxLogin: {}",wxLogin);
+            log.info(">>log:T isNull? {}",wxLogin);
             Jwt jwt = wxLoginJwtHelper.createJwt(wxLogin);
-            log.info(">>log:code:[{}] id:[{}] openid:[{}] 校验成功", code, user_id,sessionMap.get(2));
+            log.info(">>log:code:[{}] id:[{}] openid:[{}] 校验成功", code, wxLogin.getUser_id(),sessionMap.get(1));
             sessionMap.put(6,jwt.getJwtString());
-
+            //get session_key
+            sessionMap.put(11,sessionMap.get(0));
 
         }
         return sessionMap;
     }
 
     @Override
-    public Map<String,Object> authorizeData(String user_id, String openid, String rawData,String signature) throws AuthorizeErrorException {
-        String signature2 = SecretUtil.shaCheck(rawData,signature);
+    public Map<String,Object> authorizeData(String user_id, String openid, String rawData,String signature,String sessionKey) throws AuthorizeErrorException {
+
+        String signature2 = SecretUtil.shaCheck(rawData,sessionKey);
+        log.info("authorize rawData:{}  ,sessionkey:{}",rawData,sessionKey);
         if(signature2.equals(signature)){
             JSONObject userInfo = JSONObject.parseObject(rawData);
             WXUser wxUser = new WXUser(openid,"",user_id,userInfo.getString("nickName")
                     ,userInfo.getString("avatarUrl"),userInfo.getInteger("gender"));
             //更新用户信息
+            log.info("authrize data wxuser:{}",wxUser);
             wxDao.updateUser(wxUser);
+            log.info("authorize data userId:{}",user_id);
             WXUser wxUserNew = wxDao.selectUserByUserId(user_id);
-            Map<String,Object> wxUserMap = new HashMap<>();
+            Map<String,Object> wxUserMap = new HashMap<>(3);
             wxUserMap.put("nickname",wxUserNew.getNickname());
             wxUserMap.put("headimg_url",wxUserNew.getHeadimg_url());
             wxUserMap.put("gender",wxUserNew.getGender());
             return wxUserMap;
         }else{
+            log.info("signature:{}",signature);
+            log.info("sinature2:{}",signature2);
             log.error("log>>rawData check fail");
             throw  new AuthorizeErrorException("rawData check fail");
         }
@@ -181,7 +192,8 @@ public class UserServiceImpl implements UserService {
 
         //请求数据库获得sessionKey
         String sessionKey_origin = wxDao.selectSessionKeyByOpenid(openid);
-        byte[] sessionKey = SecretUtil.decodeBase64ToBtye("tiihtNczf5v6AKRyjwEUhQ==");
+//        byte[] sessionKey = SecretUtil.decodeBase64ToBtye("tiihtNczf5v6AKRyjwEUhQ==");
+        byte[] sessionKey = SecretUtil.decodeBase64ToBtye(sessionKey_origin);
         byte[] ivs = SecretUtil.decodeBase64ToBtye(iv);
 
         String userinfoStr = SecretUtil.decrypt(encryptedData,sessionKey,ivs);
@@ -211,7 +223,8 @@ public class UserServiceImpl implements UserService {
         public Map<String,Object> getOldUserData(String user_id){
             WXUser wxUser = wxDao.selectUserByUserId(user_id);
             Map<String,Object> wxUserMap = new LinkedHashMap<>();
-            if(wxUser.getNickname()!=null&!wxUser.getNickname().equals("")){
+            log.info("wxUser:{}",wxUser);
+            if(wxUser.getNickname()!=null && !wxUser.getNickname().equals("")){
                 wxUserMap.put("nickname",wxUser.getNickname());
                 wxUserMap.put("headimg_url",wxUser.getHeadimg_url());
                 wxUserMap.put("gender",wxUser.getGender());
@@ -223,21 +236,27 @@ public class UserServiceImpl implements UserService {
 
 
     public static void main(String[] args) throws AuthorizeErrorException {
-        UserServiceImpl userServiceImpl = new UserServiceImpl();
-        String openid = "";
-        String user_id = "";
-        userServiceImpl.authorizeEncrypted(user_id,openid,"CiyLU1Aw2KjvrjMdj8YKliAjtP" +
-                        "4gsMZMQmRzooG2xrDcvSnxIMXFufNstNGTyaGS9uT5geRa0W4o" +
-                        "TOb1WT7fJlAC+oNPdbB+3hVbJSRgv+4lGOETKUQz6OYStslQ142" +
-                        "dNCuabNPGBzlooOmB231qMM85d2/fV6ChevvXvQP8Hkue1poOFt" +
-                        "nEtpyxVLW1zAo6/1Xx1COxFvrc2d7UL/lmHInNlxuacJXwu0fjpX" +
-                        "fz/YqYzBIBzD6WUfTIF9GRHpOn/Hz7saL8xz+W//FRAUid1OksQaQ" +
-                        "x4CMs8LOddcQhULW4ucetDf96JcR3g0gfRK4PC7E/r7Z6xNrXd2UI" +
-                        "eorGj5Ef7b1pJAYB6Y5anaHqZ9J6nKEBvB4DnNLIVWSgARns/8wR" +
-                        "2SiRS7MNACwTyrGvt9ts8p12PKFdlqYTopNHR1Vf7XjfhQlVsAJd" +
-                        "NiKdYmYVoKlaRv85IfVunYzO0IKXsyl7JCUjCpoG20f0a04COwfne" +
-                        "QAGGwd5oa+T8yO5hzuyDb/XcxxmK01EpqOyuxINew=="
-        ,"r7BXXKkLb8qrSNn05n0qiA==");
+//        UserServiceImpl userServiceImpl = new UserServiceImpl();
+//        String openid = "";
+//        String user_id = "";
+//        userServiceImpl.authorizeEncrypted(user_id,openid,"CiyLU1Aw2KjvrjMdj8YKliAjtP" +
+//                        "4gsMZMQmRzooG2xrDcvSnxIMXFufNstNGTyaGS9uT5geRa0W4o" +
+//                        "TOb1WT7fJlAC+oNPdbB+3hVbJSRgv+4lGOETKUQz6OYStslQ142" +
+//                        "dNCuabNPGBzlooOmB231qMM85d2/fV6ChevvXvQP8Hkue1poOFt" +
+//                        "nEtpyxVLW1zAo6/1Xx1COxFvrc2d7UL/lmHInNlxuacJXwu0fjpX" +
+//                        "fz/YqYzBIBzD6WUfTIF9GRHpOn/Hz7saL8xz+W//FRAUid1OksQaQ" +
+//                        "x4CMs8LOddcQhULW4ucetDf96JcR3g0gfRK4PC7E/r7Z6xNrXd2UI" +
+//                        "eorGj5Ef7b1pJAYB6Y5anaHqZ9J6nKEBvB4DnNLIVWSgARns/8wR" +
+//                        "2SiRS7MNACwTyrGvt9ts8p12PKFdlqYTopNHR1Vf7XjfhQlVsAJd" +
+//                        "NiKdYmYVoKlaRv85IfVunYzO0IKXsyl7JCUjCpoG20f0a04COwfne" +
+//                        "QAGGwd5oa+T8yO5hzuyDb/XcxxmK01EpqOyuxINew=="
+//        ,"r7BXXKkLb8qrSNn05n0qiA==");
+        JwtHelper<WXLogin> jwtHelper = new JwtHelper<>("HmacSHA256",1000,"lengend");
+        WXLogin wxLogin = new WXLogin("asd","asd","asd",
+                "asd","asd","qwe","qwe");
+        Jwt jwt = jwtHelper.createJwt(wxLogin);
+        System.out.println(jwt.getParameter("user_id"));
+
     }
 
 }

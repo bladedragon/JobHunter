@@ -25,7 +25,7 @@ public class JwtIntercepter implements HandlerInterceptor {
     private JwtHelper<WXLogin> WXUserJwtHelper;
 
 
-    private static final Pattern pattern = Pattern.compile("token\\s+(.*?)");
+    private static final Pattern pattern = Pattern.compile("token\\s+(.*?)$");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -37,8 +37,12 @@ public class JwtIntercepter implements HandlerInterceptor {
 //        response.setContentType("application/json; charset=utf-8");
         PrintWriter writer = null;
         if(matcher.find()){
-            String jwtInHeader = matcher.group(1);
+            String jwtInHeader = matcher.group(1).trim();
+
+
             Jwt jwt = Jwt.fromString(jwtInHeader);
+
+            log.info("to jwt:{}",jwt.getParameter("user_id"));
             if(WXUserJwtHelper.isAuthorize(jwt)){
                 if(jwt.isOverTime()){
                     log.warn(">>jwt:[{}] is time over",jwt.getParameter("user_id"));

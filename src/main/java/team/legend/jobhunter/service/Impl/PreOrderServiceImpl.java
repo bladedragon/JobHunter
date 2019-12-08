@@ -2,9 +2,11 @@ package team.legend.jobhunter.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.SpringNamingPolicy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +21,8 @@ import team.legend.jobhunter.utils.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 逻辑要大改
@@ -34,6 +34,8 @@ public class PreOrderServiceImpl implements PreOrderService {
 
     @Value("${file.fileUrl}")
     String fileUrl;
+    @Value("${file.webFileUrl}")
+    String webFileUrl;
 
     @Autowired
     RedisTemplate<String,PreOrder> preOrderRedisTemplate;
@@ -46,37 +48,7 @@ public class PreOrderServiceImpl implements PreOrderService {
 
 
 
-//    @Override
-//    public Map<String, PreOrder> createPreOrder(String service_type,String service_id, String stu_id, String tea_id,TimeItem timeItem) {
-//        Map<String,PreOrder> res_map = new HashMap<>(10);
-//
-//        String lockTimestamp = String.valueOf(System.currentTimeMillis()+ Constant.LOCK_EXPIRE_TIME);
-//
-////        redisLockHelper.lock(service_id,lockTimestamp);
-//
-//        PreOrder preOrder = preOrderRedisTemplate.opsForValue().get(service_id);
-//        if(preOrder == null){
-//            //获取ID计算公式等待完善
-//            String preOrderId = idGenerator.createPreOrderId(service_id,1);
-//            String orderId = idGenerator.createOrderId(service_id,1);
-//            //价格计算公式等待完善
-////            String price = PriceUtil.getPrice(timeItem.getItem_origin_price(),timeItem.getItem_discount());
-////            String currTime = String.valueOf(System.currentTimeMillis()/1000);
-////            preOrder = new PreOrder(preOrderId,orderId,service_id,tea_id,stu_id,timeItem.getItem_id(),timeItem.getItem_time(),
-////                    price,timeItem.getIsonline(),timeItem.getItem_time_detail(),currTime
-////                    ,service_type,System.currentTimeMillis()/1000);
-//            //插入redis数据库
-//            preOrderRedisTemplate.opsForValue().set(service_id,preOrder);
-//            PreOrder preOrder_res = preOrderRedisTemplate.opsForValue().get(service_id);
-//            res_map.put("success",preOrder_res);
-//
-//        }else{
-//            res_map.put("be created!",preOrder);
-//        }
-//
-////        redisLockHelper.unlock(service_id,lockTimestamp);
-//        return res_map;
-//    }
+
 
     @Override
     @Transactional(rollbackFor = IOException.class)
@@ -91,16 +63,17 @@ public class PreOrderServiceImpl implements PreOrderService {
                 String originFileName = file.getOriginalFilename();
                 String[] strs = originFileName.split("\\.");
                 String fileSuffix = strs[1];
-                String preName = SecretUtil.MD5Encode(preOrderId).substring(0, 5);
-                String fileName = preName + CommonUtil.getNowTime();
-                String fileFullName = fileName + "." + fileSuffix;
-                String fileFullUrl = fileUrl + preOrderId.substring(0,5)+"/"+fileFullName;
+                String preName = SecretUtil.MD5Encode(originFileName).substring(0, 10);
+                String fileName = preName + "." + fileSuffix;
+                String fileFullName = preOrderId.substring(0,5)+"/"+fileName;
+                String fileFullUrl = fileUrl + fileFullName;
                 File dir = new File(fileUrl+preOrderId.substring(0,5));
                 dir.mkdirs();
+
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(preOrderId, fileFullUrl, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
+                    int num = fileDao.insertFileUrl(preOrderId, webFileUrl+fileFullName, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -138,13 +111,27 @@ public class PreOrderServiceImpl implements PreOrderService {
         String order_type = jsonObject.getString("orderType");
 
 
-
         //插入待付款订单，存在即更新
-
         String preOrder_id = null;
         PreOrder preOrder = preOrderDao.selectAllByTeaIdAndStuId(teaId,stuId);
         log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
+
+        //是否超过过期时间
+        if(preOrder != null && preOrder.getExpire()-System.currentTimeMillis()/1000< 0){
+            //放入失效订单表
+            preOrderDao.insertInvaludOrder(preOrder.getPreorder_id(),preOrder.getTea_id(),preOrder.getStu_id(),
+                    preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),
+                    preOrder.getIsonline(),preOrder.getCreate_date(),preOrder.getOrder_type(),preOrder.getPrice(),preOrder.getDiscount());
+            int num = preOrderDao.deletePreOrder(preOrder.getPreorder_id());
+                //置preOrder为null
+            preOrder = null;
+            res_map.put("overTime","203");
+        }
+        log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
+
+
         if(preOrder == null){
+
             String service_id = idGenerator.createServiceId(teaId);
             int count = preOrderDao.getCount();
             preOrder_id = idGenerator.createPreOrderId(service_id,count);
@@ -157,27 +144,14 @@ public class PreOrderServiceImpl implements PreOrderService {
             res_map.put("code","201");
         }else{
             //只更新用户的几个字段
-            preOrderDao.updatePreOrder(realName,tele,experience,requirement,isonline,price,discount,System.currentTimeMillis()/1000);
+            preOrderDao.updatePreOrder(realName,tele,experience,requirement,isonline,price,discount,System.currentTimeMillis());
             res_map.put("code","202");
         }
 
         preOrder = preOrderDao.selectAllByTeaIdAndStuId(teaId, stuId);
-        log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
-        //是否超过过期时间
 
-        if(preOrder.getExpire()-System.currentTimeMillis()/1000< 0){
-            //放入失效订单表
-            preOrderDao.insertInvaludOrder(preOrder.getPreorder_id(),preOrder.getTea_id(),preOrder.getStu_id(),
-                    preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),
-                    preOrder.getIsonline(),preOrder.getCreate_date(),preOrder.getOrder_type(),preOrder.getPrice(),preOrder.getDiscount());
-            int num = preOrderDao.deletePreOrder(preOrder.getPreorder_id());
+        res_map.put("preOrderId",preOrder.getPreorder_id());
 
-            res_map.put("overTime",null);
-            return res_map;
-        }else{
-
-            res_map.put("preOrderId",preOrder.getPreorder_id());
-        }
         log.error("-----------------------------{}----------------------------------------",System.currentTimeMillis()-now);
         return res_map;
     }
@@ -196,20 +170,29 @@ public class PreOrderServiceImpl implements PreOrderService {
 
 
     public static void main(String[] args) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("stuId","123456");
-        map.put("teaId","324325");
-        map.put("orderType","resume");
-        map.put("realName","蒋龙");
-        map.put("tele","123454654");
-        map.put("experience","sdoiashdoiashf");
-        map.put("guidance","大撒大撒安神颗粒的你看受到了看上了看你的");
-        map.put("isonline",1);
-        map.put("price",20000);
-        map.put("discount",98);
-        map.put("isUploadFile",1);
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("stuId","123456");
+//        map.put("teaId","324325");
+//        map.put("orderType","resume");
+//        map.put("realName","蒋龙");
+//        map.put("tele","123454654");
+//        map.put("experience","sdoiashdoiashf");
+//        map.put("guidance","大撒大撒安神颗粒的你看受到了看上了看你的");
+//        map.put("isonline",1);
+//        map.put("price",20000);
+//        map.put("discount",98);
+//        map.put("isUploadFile",1);
+//
+//        System.out.println(JSON.toJSONString(map));
+        long expire = 1576067217;
 
-        System.out.println(JSON.toJSONString(map));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String expireTime = simpleDateFormat.format(expire*1000);
+        Date date = new Date();
+        System.out.println(expireTime);
+        String date1 = simpleDateFormat.format(date.getTime()/1000);
+
+
 
     }
 

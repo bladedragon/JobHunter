@@ -54,6 +54,7 @@ public class ServServiceImp implements ServService {
             List<String> tags = CommonUtil.toStrList(offorStr);
             showTeaMap.put("service_id",showTeaDO.getService_id());
             showTeaMap.put("tea_id",showTeaDO.getTea_id());
+            showTeaMap.put("tea_nickname",showTeaDO.getTea_nickname());
             showTeaMap.put("tea_img_url",showTeaDO.getTea_img_url());
             showTeaMap.put("tea_description",showTeaDO.getTea_description());
             showTeaMap.put("tea_tag",tags);
@@ -123,6 +124,7 @@ public class ServServiceImp implements ServService {
             List<String> tags = CommonUtil.toStrList(offorStr);
             showTeaMap.put("service_id",showTeaDO.getService_id());
             showTeaMap.put("tea_id",showTeaDO.getTea_id());
+            showTeaMap.put("tea_nickname",showTeaDO.getTea_nickname());
             showTeaMap.put("tea_img_url",showTeaDO.getTea_img_url());
             showTeaMap.put("tea_description",showTeaDO.getTea_description());
             showTeaMap.put("tea_tag",tags);

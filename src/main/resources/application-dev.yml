@@ -38,6 +38,11 @@ spring:
         test-while-idle: true  #申请连接的时候检测，如果空闲时间大
 
 file:
+  webImgUrl: D://test/
+  webFileUrl: D://test/
+  webLogoUrl: D://test/
   imgUrl: D://test/
   fileUrl: D://test/
   defaultImgUrl: C:/Users/11566/Pictures/icons/布丁.png
+  logo_url: D://test/
+  defaultLogo: C:/Users/11566/Pictures/icons/布丁.png

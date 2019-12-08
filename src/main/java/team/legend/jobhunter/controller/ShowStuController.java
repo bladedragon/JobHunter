@@ -20,7 +20,7 @@ public class ShowStuController {
     @PostMapping(value = "/getHome",produces = "application/json;charset=UTF-8")
     public String showStuHome(@RequestBody JSONObject jsonObject){
         String stuId = jsonObject.getString("stuId");
-        if(stuId==null || stuId.equals("")){
+        if(stuId ==null || stuId.equals("")){
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param is error");
         }
         Map<String,Object> result = stuHomeService.getStuHome(stuId);

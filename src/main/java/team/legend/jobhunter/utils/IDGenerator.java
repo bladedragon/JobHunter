@@ -87,7 +87,6 @@ public class IDGenerator {
 
     public static void main(String[] args) {
 //        System.out.println(String.valueOf(System.currentTimeMillis()).substring(0,4));
-        System.out.println(UUID.randomUUID().toString().hashCode());
-
+//        System.out.println(UUID.randomUUID().toString().hashCode());
     }
 }

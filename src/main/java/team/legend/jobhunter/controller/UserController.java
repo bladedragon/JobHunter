@@ -25,7 +25,7 @@ public class UserController {
     @RequestMapping(value = "wx/login",produces = "application/json;charset=UTF-8")
     public String userLogin(@RequestBody JSONObject reqMsg) throws ParamErrorException, AuthorizeErrorException{
         log.info(">>request url: /wx/login");
-        log.info("new version");
+
         Map<String,Object> data = new LinkedHashMap<>();
         String responseMsg = "success";
 
@@ -43,6 +43,7 @@ public class UserController {
             data.put("create_date",login_result.get(4));
             data.put("last_login",login_result.get(5));
             if(login_result.containsKey(10)){
+                data.put("tea_id",login_result.get(10));
                 data.put("isTeacher","true");
             }else{
                 data.put("isTeacher","false");
@@ -53,7 +54,7 @@ public class UserController {
 
         if(reqMsg.containsKey("rawData")&&reqMsg.containsKey("signature")){
             log.info(">>log:authorize start");
-            Map<String,Object> authorize_result = userService.authorizeData(login_result.get(3),login_result.get(1),reqMsg.getString("rawData"),reqMsg.getString("signature"));
+            Map<String,Object> authorize_result = userService.authorizeData(login_result.get(3),login_result.get(1),reqMsg.getString("rawData"),reqMsg.getString("signature"),login_result.get(11));
             data.put("wx_user",authorize_result);
         }else{
             Map<String,Object> oldData = userService.getOldUserData(login_result.get(3));

@@ -40,6 +40,11 @@ spring:
 
 
 file:
-  imgUrl: /headimg/
+  webImgUrl: https://api.zblade.top/jobhunter/headimg/
+  webFileUrl: https:/api.zblade.top/jobhunter/files/
+  webLogoUrl: https://api.zblade.top/jobhunter/logo/
+  imgUrl: /usr/local/jobhunter/headimg/
   fileUrl: /files/
   defaultImgUrl: /Unicorn.png
+  logo_url: /logos/
+  defaultLogo: /Unicorn.png

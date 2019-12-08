@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.legend.jobhunter.dao.OrderDao;
 import team.legend.jobhunter.exception.SqlErrorException;
 import team.legend.jobhunter.model.DO.OrderValidDO;
-import team.legend.jobhunter.model.Order;
+
 import team.legend.jobhunter.service.ConfirmService;
 
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class ConfirmServiceImpl  implements ConfirmService {
             return response;
         }
 
-        int num = orderDao.updateOrderInfo(System.currentTimeMillis()/1000,orderId,location,appointTime);
+        int num = orderDao.updateOrderInfo(System.currentTimeMillis(),orderId,location,appointTime);
         if(num ==1){
             response.put("success",null);
             return response;
@@ -58,7 +58,7 @@ public class ConfirmServiceImpl  implements ConfirmService {
         }
         if(!order.getAppoint_location().equals("") && order.getAppoint_time()!=0){
             if(order.getOrder_confirm() != 1){
-                orderDao.confirmOrder(orderId,System.currentTimeMillis()/1000);
+                orderDao.confirmOrder(orderId,System.currentTimeMillis());
                 return 0;
             }else{
                 log.error(">>log: order has been confirmed");
@@ -92,7 +92,7 @@ public class ConfirmServiceImpl  implements ConfirmService {
             }
 
             try {
-                num = orderDao.confirmTeaAccomplish(orderId,System.currentTimeMillis()/1000);
+                num = orderDao.confirmTeaAccomplish(orderId,System.currentTimeMillis());
                 if (teaIdInBase.getStu_confirm() == 1) {
                     num  += orderDao.updateStatus(orderId);
                 }
@@ -116,7 +116,7 @@ public class ConfirmServiceImpl  implements ConfirmService {
             }
 
             try {
-                num = orderDao.confirmStuAccomplish(orderId,System.currentTimeMillis()/1000);
+                num = orderDao.confirmStuAccomplish(orderId,System.currentTimeMillis());
                 if (stuIdInBase.getTea_confirm() == 1) {
                     num  += orderDao.updateStatus(orderId);
                 }
