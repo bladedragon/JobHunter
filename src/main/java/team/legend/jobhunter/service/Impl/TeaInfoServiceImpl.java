@@ -208,6 +208,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
         }catch (RuntimeException e){
             throw new RuntimeException();
         }
+        log.info(">>modify taeInfo:{}",teaInfo);
         return teaInfo;
     }
 
@@ -235,7 +236,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
                return null;
            }
 
-        System.out.println(teacher.getTea_realname());
+
         if(teacher == null ){
             teaMap.put("fail",null);
         }
@@ -359,7 +360,7 @@ public class TeaInfoServiceImpl implements TeaInfoService {
 
     public static void main(String[] args) {
         TeaInfoServiceImpl teaInfoService = new TeaInfoServiceImpl();
-        String code = teaInfoService.getVerifyCode("oYujX5Riw4pu8xy_3pAguP7cx6_A","D210752226");
+        String code = teaInfoService.getVerifyCode("oYujX5SRPux9wNltaL5fGrxC-L0U","BCEF752227");
         System.out.println(code);
     }
 }

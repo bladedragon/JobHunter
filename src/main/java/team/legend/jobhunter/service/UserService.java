@@ -12,7 +12,7 @@ public interface UserService {
 
     public Map<String,Object> authorizeEncrypted(String user_id,String openid,String encryptedData, String iv) throws AuthorizeErrorException;
 
-    public Map<String,Object> authorizeData(String user_id,String openid,String rawData,String signature,String sessionKey ) throws AuthorizeErrorException;
+    public Map<String,Object> authorizeData(String rawData,String signature,String userId) throws AuthorizeErrorException;
 
     public Map<String,Object> getOldUserData(String user_id);
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import team.legend.jobhunter.exception.JwtOverTimeException;
 import team.legend.jobhunter.jwt.Jwt;
 import team.legend.jobhunter.jwt.JwtHelper;
 import team.legend.jobhunter.model.WXLogin;
@@ -30,29 +31,42 @@ public class JwtIntercepter implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info(">>request URL:{}",request.getRequestURI());
-
+        PrintWriter writer = null;
         String authorization = request.getHeader("Authorization");
 
+        if(authorization==null||authorization.equals("")){
+            writer = response.getWriter();
+            writer.append(CommonUtil.returnFormatSimp(Constant.ERROR_JWT_AUTHORIZE_FAIL,"lose Authorization "));
+            return false;
+        }
         Matcher matcher = pattern.matcher(authorization);
 //        response.setContentType("application/json; charset=utf-8");
-        PrintWriter writer = null;
+
         if(matcher.find()){
             String jwtInHeader = matcher.group(1).trim();
 
+            Jwt jwt = null;
+            try{
+                jwt = Jwt.fromString(jwtInHeader);
+            }catch (Exception e){
+                log.info(">>jwt:parse error,jwtInHeader:[{}]",jwtInHeader);
+                writer = response.getWriter();
+                writer.append(CommonUtil.returnFormatSimp(Constant.ERROR_JWT_AUTHORIZE_FAIL,"authorize fail"));
+                return false;
+            }
 
-            Jwt jwt = Jwt.fromString(jwtInHeader);
 
             log.info("to jwt:{}",jwt.getParameter("user_id"));
             if(WXUserJwtHelper.isAuthorize(jwt)){
                 if(jwt.isOverTime()){
                     log.warn(">>jwt:[{}] is time over",jwt.getParameter("user_id"));
-
+//                    throw new JwtOverTimeException("time over");
                     try{
                         writer = response.getWriter();
                         writer.append(CommonUtil.returnFormatSimp(Constant.ERROR_JWT_TIMWOUT,"time over"));
                     }catch (Exception e){
                         e.printStackTrace();
-                        response.sendError(500);
+//                        response.sendError(500);
                     }
                     return false;
                 }else{
@@ -68,7 +82,7 @@ public class JwtIntercepter implements HandlerInterceptor {
                     writer.append(CommonUtil.returnFormatSimp(Constant.ERROR_JWT_AUTHORIZE_FAIL,"authorize fail"));
                 }catch (Exception e){
                     e.printStackTrace();
-                    response.sendError(500);
+//                    response.sendError(500);
                 }
                 return false;
             }

@@ -67,6 +67,7 @@ public class Jwt {
         long jwtExp = Long.parseLong(payload.get("exp"));
         long jwtNbf = Long.parseLong(payload.get("nbf"));
         return nowTime > jwtExp || nowTime < jwtNbf;
+//        return true;
     }
 
 

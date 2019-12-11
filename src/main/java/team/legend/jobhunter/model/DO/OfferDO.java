@@ -7,14 +7,14 @@ import lombok.Data;
 @AllArgsConstructor
 public class OfferDO {
 
-    private String offerId;
-    private String company;
-    private int type;
+    private String offerid;
+    private String offer;
     private String location;
-    private String updatre_date;
-    private String description;
-    private String requirement;
-    private String post_way;
+    private String company;
+    private Integer type;
+    private String timestamp;
+    private String  logo;
+
 
 
 }

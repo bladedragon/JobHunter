@@ -20,7 +20,7 @@ import team.legend.jobhunter.utils.SecretUtil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static sun.security.x509.CertificateAlgorithmId.ALGORITHM;
+
 
 @Slf4j
 @Service
@@ -161,13 +161,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String,Object> authorizeData(String user_id, String openid, String rawData,String signature,String sessionKey) throws AuthorizeErrorException {
+    public Map<String,Object> authorizeData(String rawData,String signature,String user_id) throws AuthorizeErrorException {
 
-        String signature2 = SecretUtil.shaCheck(rawData,sessionKey);
-        log.info("authorize rawData:{}  ,sessionkey:{}",rawData,sessionKey);
+        WXLogin wxLogin = wxDao.selectByUserId(user_id);
+        if(wxLogin ==null || wxLogin.getOpenid().equals("")){
+            log.error(">>log: wxlogin is null ,user_id:[{}]",user_id);
+            throw  new AuthorizeErrorException("cannot get user's login info");
+        }
+
+        String signature2 = SecretUtil.shaCheck(rawData,wxLogin.getSession_key());
+        log.info("authorize rawData:{}  ,sessionkey:{}",rawData,wxLogin.getSession_key());
         if(signature2.equals(signature)){
             JSONObject userInfo = JSONObject.parseObject(rawData);
-            WXUser wxUser = new WXUser(openid,"",user_id,userInfo.getString("nickName")
+            WXUser wxUser = new WXUser(wxLogin.getOpenid(),"",user_id,userInfo.getString("nickName")
                     ,userInfo.getString("avatarUrl"),userInfo.getInteger("gender"));
             //更新用户信息
             log.info("authrize data wxuser:{}",wxUser);

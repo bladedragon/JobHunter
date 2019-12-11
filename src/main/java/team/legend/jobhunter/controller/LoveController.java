@@ -1,6 +1,7 @@
 package team.legend.jobhunter.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class LoveController {
 
@@ -28,6 +30,8 @@ public class LoveController {
         }
         Map<String,Integer> data = new HashMap<>(1);
         String offerId = jsonObject.getString("offerId");
+
+        log.info("stuId={}, offerId={}",stuId,offerId);
         int num = loveService.love(stuId,offerId);
         if(num == 0){
             return  CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"Unknow Error");
@@ -45,8 +49,12 @@ public class LoveController {
         }
         int page = jsonObject.getInteger("page");
         int pagesize = jsonObject.getInteger("pagesize");
+
         Map<String,Object> map = loveService.getLove(stuId,page,pagesize);
 
+        if(map == null){
+            return CommonUtil.returnFormatSimp(Constant.INFO_EMPTY_CODE,"empty");
+        }
         return CommonUtil.returnFormat(200,"success",map);
     }
 

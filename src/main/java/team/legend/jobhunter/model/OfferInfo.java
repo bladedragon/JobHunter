@@ -19,20 +19,20 @@ public class OfferInfo {
     private Long  update_timestamp;
     private String logo;
 
-    OfferInfo(String offer_id,String offer_name,String offer_requirement,String offer_location,
-              String offer_company_name,String offer_type,String offer_description,String offer_post_way,
-              String offer_salary){
-            this.offer_id = offer_id;
-            this.offer_company_name = offer_company_name;
-            this.offer_description  = offer_description;
-            this.offer_location = offer_location;
-            this.offer_name = offer_name;
-            this.offer_requirement = offer_requirement;
-            this.offer_post_way = offer_post_way;
-            this.offer_salary = offer_salary;
-            this.offer_type = offer_type;
-            this.update_timestamp = System.currentTimeMillis()/1000;
-
-    }
+//     OfferInfo(String offer_id,String offer_name,String offer_requirement,String offer_location,
+//              String offer_company_name,String offer_type,String offer_description,String offer_post_way,
+//              String offer_salary){
+//            this.offer_id = offer_id;
+//            this.offer_company_name = offer_company_name;
+//            this.offer_description  = offer_description;
+//            this.offer_location = offer_location;
+//            this.offer_name = offer_name;
+//            this.offer_requirement = offer_requirement;
+//            this.offer_post_way = offer_post_way;
+//            this.offer_salary = offer_salary;
+//            this.offer_type = offer_type;
+//            this.update_timestamp = System.currentTimeMillis();
+//
+//    }
 
 }

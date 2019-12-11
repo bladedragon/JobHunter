@@ -62,7 +62,7 @@ public class PreOrderServiceImpl implements PreOrderService {
                 }
                 String originFileName = file.getOriginalFilename();
                 String[] strs = originFileName.split("\\.");
-                String fileSuffix = strs[1];
+                String fileSuffix = strs[strs.length-1];
                 String preName = SecretUtil.MD5Encode(originFileName).substring(0, 10);
                 String fileName = preName + "." + fileSuffix;
                 String fileFullName = preOrderId.substring(0,5)+"/"+fileName;
@@ -104,7 +104,7 @@ public class PreOrderServiceImpl implements PreOrderService {
         String realName = jsonObject.getString("realName");
         String tele = jsonObject.getString("tele");
         String experience = jsonObject.getString("experience");
-        String requirement = jsonObject.getString("guidance");
+        String requirement = jsonObject.getString("requirement");
         int isonline = jsonObject.getInteger("isonline");
         int price = jsonObject.getInteger("price");
         int discount = jsonObject.getInteger("discount");

@@ -43,8 +43,11 @@ file:
   webImgUrl: https://api.zblade.top/jobhunter/headimg/
   webFileUrl: https:/api.zblade.top/jobhunter/files/
   webLogoUrl: https://api.zblade.top/jobhunter/logo/
+  webFeedUrl: https://api.zblade.top/jobhunter/feedback/
   imgUrl: /usr/local/jobhunter/headimg/
-  fileUrl: /files/
+  fileUrl: /usr/local/jobhunter/files/
   defaultImgUrl: /Unicorn.png
-  logo_url: /logos/
+  logo_url: /usr/local/jobhunter/logo/
   defaultLogo: /Unicorn.png
+  feedUrl: /usr/local/jobhunter/feedback/
+

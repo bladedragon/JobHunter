@@ -23,7 +23,7 @@ public class UploadController {
     OrderService orderService;
 
     @PostMapping(value = "/uploadFile",produces = "application/json;charset=UTF-8")
-    public String upload(@RequestParam String orderId,@RequestParam(value = "files") List<MultipartFile> files) throws UploadException {
+    public String upload(@RequestParam String orderId,@RequestParam("fileName") String fileName,@RequestParam(value = "files") List<MultipartFile> files) throws UploadException {
 
         Map<String,Object> result = new HashMap<>();
 
@@ -31,7 +31,7 @@ public class UploadController {
             return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"param not match exception");
         }
 
-        int failNum = orderService.uploadFile(files,orderId, Constant.TEA_FILE);
+        int failNum = orderService.uploadFile(files,orderId, Constant.TEA_FILE,fileName);
 
         if(failNum != 0){
             result.put("orderId",orderId);

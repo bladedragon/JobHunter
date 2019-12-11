@@ -43,6 +43,7 @@ public class OrderController {
         }
         String teaId = jsonObject.getString("teaId");
         String stuId = jsonObject.getString("stuId");
+        String filename = jsonObject.getString("fileName");
 
         //上锁
         String lockTimestamp = String.valueOf(System.currentTimeMillis()+ Constant.LOCK_EXPIRE_TIME);
@@ -58,13 +59,13 @@ public class OrderController {
             map = orderService.createOrder(preOrderId);
         }else{
 
-            String order_type = jsonObject.getString("type");
+            String order_type = jsonObject.getString("orderType");
             int price = jsonObject.getInteger("price");
             int discount = jsonObject.getInteger("discount");
             int isonline = jsonObject.getInteger("isonline");
             String experience = jsonObject.getString("experience");
             String requirement = jsonObject.getString("requirement");
-            String realName = jsonObject.getString("realname");
+            String realName = jsonObject.getString("realName");
             String tele = jsonObject.getString("tele");
             map = orderService.createOrder(teaId,stuId,null,order_type,price,discount,isonline,realName,tele,experience,requirement);
         }
@@ -84,7 +85,7 @@ public class OrderController {
                 map.put("failNum",1);
                 return CommonUtil.returnFormat(Constant.FAIL_UPLOAD,"success but failUpload",map);
             }
-             num = orderService.uploadFile(files, (String) map.get("orderId"),Constant.STU_FILE);
+             num = orderService.uploadFile(files, (String) map.get("orderId"),Constant.STU_FILE,filename);
         }
 
 

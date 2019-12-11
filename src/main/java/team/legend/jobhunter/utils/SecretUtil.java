@@ -3,7 +3,7 @@ package team.legend.jobhunter.utils;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import sun.security.provider.MD5;
+
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;

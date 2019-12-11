@@ -41,8 +41,10 @@ file:
   webImgUrl: D://test/
   webFileUrl: D://test/
   webLogoUrl: D://test/
+  webFeedUrl: D://test/
   imgUrl: D://test/
   fileUrl: D://test/
   defaultImgUrl: C:/Users/11566/Pictures/icons/布丁.png
   logo_url: D://test/
   defaultLogo: C:/Users/11566/Pictures/icons/布丁.png
+  feedUrl: D://test/feedback/

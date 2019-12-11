@@ -16,6 +16,6 @@ public interface OrderService {
 
     Map<String,Object> createOrder(String preOrderId) throws SqlErrorException;
 
-    int uploadFile(List<MultipartFile> files, String orderId,int isTea) throws UploadException;
+    int uploadFile(List<MultipartFile> files, String orderId,int isTea,String filename) throws UploadException;
 
 }

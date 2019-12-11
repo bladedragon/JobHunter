@@ -171,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = IOException.class)
-    public int uploadFile(List<MultipartFile> files, String orderId,int isTea) throws UploadException {
+    public int uploadFile(List<MultipartFile> files, String orderId,int isTea,String filename) throws UploadException {
 
             int failNum = 0;
 
@@ -181,7 +181,7 @@ public class OrderServiceImpl implements OrderService {
                 }
                 String originFileName = file.getOriginalFilename();
                 String[] strs = originFileName.split("\\.");
-                String fileSuffix = strs[1];
+                String fileSuffix = strs[strs.length-1];
                 String preName = SecretUtil.MD5Encode(orderId).substring(0, 10);
                 String fileName = preName +"." + fileSuffix ;
                 String fileFullName = orderId.substring(0,5)+"/"+fileName;
@@ -191,7 +191,7 @@ public class OrderServiceImpl implements OrderService {
                 File savedfile = new File(fileFullUrl);
                 try {
                     file.transferTo(savedfile);
-                    int num = fileDao.insertFileUrl(orderId, webFileUrl+fileFullName, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),0,originFileName);
+                    int num = fileDao.insertFileUrl(orderId, webFileUrl+fileFullName, CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"),isTea,filename);
 
                 } catch (IOException e) {
                     e.printStackTrace();

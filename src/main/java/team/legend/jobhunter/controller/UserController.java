@@ -13,6 +13,7 @@ import team.legend.jobhunter.exception.ParamErrorException;
 import team.legend.jobhunter.model.WXUser;
 import team.legend.jobhunter.service.UserService;
 import team.legend.jobhunter.utils.CommonUtil;
+import team.legend.jobhunter.utils.Constant;
 
 import java.util.*;
 
@@ -52,18 +53,6 @@ public class UserController {
             return CommonUtil.returnFormatSimp(Integer.parseInt(login_result.get(-2)), login_result.get(-1));
         }
 
-        if(reqMsg.containsKey("rawData")&&reqMsg.containsKey("signature")){
-            log.info(">>log:authorize start");
-            Map<String,Object> authorize_result = userService.authorizeData(login_result.get(3),login_result.get(1),reqMsg.getString("rawData"),reqMsg.getString("signature"),login_result.get(11));
-            data.put("wx_user",authorize_result);
-        }else{
-            Map<String,Object> oldData = userService.getOldUserData(login_result.get(3));
-            if(!data.containsKey("empty")){
-                data.put("wx_user",oldData);
-                responseMsg = "successs and getOldData";
-            }
-        }
-
 //        //获取敏感信息
 //        if(reqMsg.containsKey("encryptedData")&reqMsg.containsKey("iv")){
 //            log.info(">>log:authorize start");
@@ -79,6 +68,33 @@ public class UserController {
 //            }
 //        }
 
+        return CommonUtil.returnFormat(200,responseMsg,data);
+    }
+
+    @RequestMapping(value = "wx/authorize",produces = "application/json;charset=UTF-8")
+    public String userAuthorize(@RequestBody JSONObject reqMsg) throws AuthorizeErrorException {
+
+        Map<String,Object> data = new LinkedHashMap<>();
+        String responseMsg = "success";
+
+        String stuId = reqMsg.getString("userId");
+        if(stuId == null || stuId.equals("")){
+            return CommonUtil.returnFormatSimp(Constant.PARAM_CODE,"userId is null");
+        }
+
+
+        data.put("user_id",reqMsg.getString("userId"));
+        if(reqMsg.containsKey("rawData")&&reqMsg.containsKey("signature")){
+            log.info(">>log:authorize start");
+            Map<String,Object> authorize_result = userService.authorizeData(reqMsg.getString("rawData"),reqMsg.getString("signature"),reqMsg.getString("userId"));
+            data.put("wx_user",authorize_result);
+        }else{
+            Map<String,Object> oldData = userService.getOldUserData(reqMsg.getString("userId"));
+            if(!data.containsKey("empty")){
+                data.put("wx_user",oldData);
+                responseMsg = "successs and getOldData";
+            }
+        }
         return CommonUtil.returnFormat(200,responseMsg,data);
     }
 

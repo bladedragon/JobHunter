@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import team.legend.jobhunter.dao.EvaluateDao;
 import team.legend.jobhunter.dao.LoveDao;
 import team.legend.jobhunter.dao.OfferDao;
+import team.legend.jobhunter.model.DO.OfferDO;
 import team.legend.jobhunter.model.LoveItem;
 
 import team.legend.jobhunter.model.OfferInfo;
 import team.legend.jobhunter.service.OfferService;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +26,10 @@ public class OfferServiceImpl implements OfferService {
     OfferDao offerDao;
     @Autowired
     LoveDao loveDao;
+
     @Override
     public Map<String, Object> getDetail(String offerId,String stuId) {
+        log.info(">>offerId:[{}]",offerId);
         OfferInfo offerInfo = offerDao.selectOfferInfoByOfferId(offerId);
          if(offerInfo == null){
             log.error(">>log: select offerInfo is null");
@@ -35,16 +39,25 @@ public class OfferServiceImpl implements OfferService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         LoveItem loveItem = loveDao.selectOneByStuId(stuId,offerId);
 
-         String updateDate = sdf.format(offerInfo.getUpdate_timestamp());
+//         String updateDate = null;
+//         if(updateDate !=null){
+//             updateDate = sdf.format(offerInfo.getUpdate_timestamp());
+//         }else{
+//             updateDate = "";
+//         }
          result.put("offerId",offerInfo.getOffer_id());
          result.put("offer",offerInfo.getOffer_name());
          result.put("company",offerInfo.getOffer_name());
          result.put("type",offerInfo.getOffer_type());
-         result.put("locatioon",offerInfo.getOffer_location());
-         result.put("udpate",updateDate);
+         result.put("location",offerInfo.getOffer_location());
+         result.put("timestamp",offerInfo.getUpdate_timestamp());
          result.put("description",offerInfo.getOffer_description());
          result.put("requirment",offerInfo.getOffer_requirement());
-         result.put("post_way",offerInfo.getOffer_post_way());
+         result.put("postway",offerInfo.getOffer_post_way());
+         result.put("salary",offerInfo.getOffer_salary());
+         result.put("logo",offerInfo.getLogo());
+
+        log.info("love msg:{}",loveItem);
         if(loveItem == null){
             result.put("isLoved",0);
         }else{
@@ -55,18 +68,25 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public List<OfferInfo> getOfferList(int page,int pagesize) {
-        List<OfferInfo> offerInfos = offerDao.selectOfferInfo(pagesize,page);
-            if(offerInfos != null &&!offerInfos.isEmpty()){
-                return offerInfos;
-            }
+    public Map<String,Object> getOfferList(int page,int pagesize) {
+        log.info("getOfferInfo:pagesize:[{}],page:[{}]",pagesize,page);
+        List<OfferDO> offerInfos = offerDao.selectOfferInfo(pagesize,page);
+        Map<String,Object> map = new HashMap<>(2);
+        log.info("offerInfos:{}",offerInfos);
 
-        return null;
+        int num = offerDao.getCount();
+            if(num != 0){
+                map.put("total",num);
+                map.put("list",offerInfos);
+                log.info("num = {}",num);
+                return map;
+            }else{
+                return null;
+            }
     }
 
     @Override
     public List<OfferInfo> refreshOfferList(int page, int pagesize) {
-
 
         return null;
     }

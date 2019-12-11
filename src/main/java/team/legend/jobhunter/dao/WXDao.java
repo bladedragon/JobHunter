@@ -30,6 +30,10 @@ public interface WXDao {
              "WHERE openid = #{openid}")
      WXLogin selectByOpenid(String openid);
 
+     @Select("SELECT openid ,session_key, unionid, last_login, create_date, user_id,tea_id FROM wx_data " +
+             "WHERE user_id = #{user_id}")
+     WXLogin selectByUserId(String user_id);
+
      @Select("SELECT openid, unionid, user_id, nickname, headimg_url, gender FROM wx_data " +
              "WHERE user_id = #{user_id}")
      WXUser selectUserByUserId(String user_id);

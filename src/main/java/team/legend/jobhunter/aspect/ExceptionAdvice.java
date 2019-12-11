@@ -31,6 +31,9 @@ public class ExceptionAdvice {
             log.error(">>log: file upload fail,url:{}, message: {}",request.getRequestURI(),e.getMessage());
             return CommonUtil.returnFormatSimp(Constant.UPLOAD_ERROR,e.getMessage());
         }
+        if(e.getClass() == JwtOverTimeException.class){
+            return CommonUtil.returnFormatSimp(Constant.ERROR_JWT_TIMWOUT,e.getMessage());
+        }
 //        if(e.getClass() == HttpReqException.class){
 //            log.error(">>log: request url fail");
 //            return CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"request "+e.getMessage()+" fail !");
