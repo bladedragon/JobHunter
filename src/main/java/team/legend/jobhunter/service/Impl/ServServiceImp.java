@@ -68,14 +68,14 @@ public class ServServiceImp implements ServService {
                 case 1:
                     PriceItem priceItem = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
                     prices.put("offlinePrice",priceItem.getPrice());
-                    discounts.put("onlineDiscount",priceItem.getDiscount());
-                    break;
-                case 2:
-                    PriceItem priceItem1 = priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
-                    prices.put("onlinePrice",priceItem1.getPrice());
-                    discounts.put("offlineDiscount",priceItem1.getDiscount());
+                    discounts.put("offlineDiscount",priceItem.getDiscount());
                     break;
                 case 0:
+                    PriceItem offPrice = priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
+                    prices.put("onlinePrice",offPrice.getPrice());
+                    discounts.put("onlineDiscount",offPrice.getDiscount());
+                    break;
+                case 2:
                     PriceItem priceItem2 = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
                     PriceItem priceItem3 =priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
                     prices.put("onlinePrice",priceItem3.getPrice());
@@ -139,14 +139,14 @@ public class ServServiceImp implements ServService {
                 case 1:
                     PriceItem priceItem = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
                     prices.put("offlinePrice",priceItem.getPrice());
-                    discounts.put("onlineDiscount",priceItem.getDiscount());
-                    break;
-                case 2:
-                    PriceItem priceItem1 = priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
-                    prices.put("onlinePrice",priceItem1.getPrice());
-                    discounts.put("offlineDiscount",priceItem1.getDiscount());
+                    discounts.put("offlineDiscount",priceItem.getDiscount());
                     break;
                 case 0:
+                    PriceItem priceItem1 = priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
+                    prices.put("onlinePrice",priceItem1.getPrice());
+                    discounts.put("onlineDiscount",priceItem1.getDiscount());
+                    break;
+                case 2:
                     PriceItem priceItem2 = priceDao.selectPriceByType(Constant.OFFLINE_PRICE_STATUS);
                     PriceItem priceItem3 =priceDao.selectPriceByType(Constant.ONLINE_PRICE_STATUS);
                     prices.put("onlinePrice",priceItem3.getPrice());

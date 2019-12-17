@@ -19,7 +19,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         //拦截所有的controller
             registry.addInterceptor(jwtInterceptor).excludePathPatterns("/wx/**").
-                    excludePathPatterns("/getInfo/**").excludePathPatterns("/code");
+                    excludePathPatterns("/getInfo/**").excludePathPatterns("/code").excludePathPatterns("/**");
     }
 
 

@@ -337,7 +337,8 @@ public class TeaInfoServiceImpl implements TeaInfoService {
             List<FileDO> teaFiles = fileDao.selectFilePath(order.getOrder_id(),1);
             Detail detail = new Detail(order.getTea_nickname(),order.getTea_img_url(),order.getTea_gender(),
                     order.getPosition(), order.getTea_company(),order.getIsonline(),CommonUtil.toStrList(order.getTea_tag()),
-                    order.getTea_description(),order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths,teaFiles);
+                    order.getTea_description(),order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),
+                    filePaths,teaFiles,order.getTea_tele());
             map.put("detail",detail);
 
             mapList.add(map);

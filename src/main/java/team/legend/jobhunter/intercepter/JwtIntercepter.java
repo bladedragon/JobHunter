@@ -59,6 +59,7 @@ public class JwtIntercepter implements HandlerInterceptor {
             log.info("to jwt:{}",jwt.getParameter("user_id"));
             if(WXUserJwtHelper.isAuthorize(jwt)){
                 if(jwt.isOverTime()){
+
                     log.warn(">>jwt:[{}] is time over",jwt.getParameter("user_id"));
 //                    throw new JwtOverTimeException("time over");
                     try{
@@ -99,6 +100,7 @@ public class JwtIntercepter implements HandlerInterceptor {
         }
         return false;
     }
+
 
 
 }

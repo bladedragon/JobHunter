@@ -70,12 +70,15 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public Map<String,Object> getOfferList(int page,int pagesize) {
         log.info("getOfferInfo:pagesize:[{}],page:[{}]",pagesize,page);
-        List<OfferDO> offerInfos = offerDao.selectOfferInfo(pagesize,page);
+        List<OfferDO> offerInfos = offerDao.selectOfferInfo(page*pagesize,pagesize);
         Map<String,Object> map = new HashMap<>(2);
         log.info("offerInfos:{}",offerInfos);
 
         int num = offerDao.getCount();
             if(num != 0){
+                if(offerInfos.isEmpty()){
+                    return null;
+                }
                 map.put("total",num);
                 map.put("list",offerInfos);
                 log.info("num = {}",num);

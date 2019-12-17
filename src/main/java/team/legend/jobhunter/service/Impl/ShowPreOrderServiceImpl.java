@@ -81,7 +81,7 @@ public class ShowPreOrderServiceImpl implements ShowPreOrderService {
             //预订单没有老师上传附件
             Detail detail = new Detail(teacher.getTea_nickname(),teacher.getTea_img_url(),teacher.getTea_gender(),
                     teacher.getPosition(),teacher.getTea_company(),preOrder.getIsonline(),offerList,teacher.getTea_description(),
-                    preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),filePaths,null);
+                    preOrder.getRealname(),preOrder.getTele(),preOrder.getExperience(),preOrder.getRequirement(),filePaths,null,null);
             map.put("detail",detail);
             mapList.add(map);
 

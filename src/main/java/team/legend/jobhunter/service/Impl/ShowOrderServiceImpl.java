@@ -33,11 +33,11 @@ public class ShowOrderServiceImpl implements ShowOrderService {
         int count = 0;
 
         if(isTea == 1){
-            orderList = orderDao.selectByTeaId(userId,isAccomplished,page,pagesize);
+            orderList = orderDao.selectByTeaId(userId,isAccomplished,page*pagesize,pagesize);
             count = orderDao.getCountByTStatus(userId,isAccomplished);
 
         }else{
-            orderList = orderDao.selectByStuId(userId,isAccomplished,page,pagesize);
+            orderList = orderDao.selectByStuId(userId,isAccomplished,page*pagesize,pagesize);
             count = orderDao.getCountBySStatus(userId,isAccomplished);
 
         }
@@ -85,7 +85,7 @@ public class ShowOrderServiceImpl implements ShowOrderService {
             List<FileDO> teaFiles = fileDao.selectFilePath(order.getOrder_id(),1);
             Detail detail = new Detail(order.getTea_nickname(),order.getTea_img_url(),order.getTea_gender(),
                     order.getPosition(), order.getTea_company(),order.getIsonline(),offerList,order.getTea_description(),
-                    order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths,teaFiles);
+                    order.getRealname(),order.getTele(),order.getExperience(),order.getRequirement(),filePaths,teaFiles,order.getTea_tele());
             map.put("detail",detail);
             mapList.add(map);
         }

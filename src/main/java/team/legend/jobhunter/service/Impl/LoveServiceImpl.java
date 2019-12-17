@@ -36,8 +36,10 @@ public class LoveServiceImpl implements LoveService {
         if(loveItems !=null && offerId.equals(loveItems.getOffer_id())) {
             num = loveDao.delete(stuId,offerId);
             flag = 0;
+            System.out.println("unlove");
         }else{
             num = loveDao.insert(stuId,datetime,offerId);
+            System.out.println("love");
             flag =1;
         }
 
@@ -62,7 +64,7 @@ public class LoveServiceImpl implements LoveService {
             log.info("count = 0");
             return null;
         }
-        List<LoveItem> loveItemList = loveDao.selectByStuId(stuId,page,pagesize);
+        List<LoveItem> loveItemList = loveDao.selectByStuId(stuId,page*pagesize,pagesize);
         System.out.println(loveItemList);
         for (LoveItem loveItem: loveItemList) {
             Map<String,Object> map = new LinkedHashMap<>();

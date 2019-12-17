@@ -52,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
             Map<String,Object> res_map = new HashMap<>(10);
 
             Order order = orderDao.selectByTeaIdAndStuId(tea_id,stu_id);
+        System.out.println("order:"+order);
             if(order != null){
                 log.error(">>log :Order has exist");
                 res_map.put("repeat",null);
@@ -96,6 +97,8 @@ public class OrderServiceImpl implements OrderService {
        res_map.put("orderId",order.getOrder_id());
        res_map.put("teaId",order.getTea_id());
        res_map.put("stuId",order.getStu_id());
+       res_map.put("tele",order.getTele());
+       res_map.put("teaNickname",order.getTea_nickname());
 
        return res_map;
 
@@ -165,6 +168,8 @@ public class OrderServiceImpl implements OrderService {
         res_map.put("orderId",order.getOrder_id());
         res_map.put("teaId",order.getTea_id());
         res_map.put("stuId",order.getStu_id());
+        res_map.put("tele",order.getTele());
+        res_map.put("teaNickname",order.getTea_nickname());
         return res_map;
     }
 

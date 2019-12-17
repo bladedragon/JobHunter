@@ -17,9 +17,10 @@ public interface OfferDao {
         @Select("SELECT t1.offer_id as offerId, offer_name as offer, offer_location as location, " +
                 "offer_company_name as company , offer_type as type , update_timestamp as timestamp,logo " +
                 "FROM  offer_info t1 " +
-            "JOIN (SELECT offer_id FROM offer_info limit #{page}, #{pagesize} ) t2 " +
+            "JOIN (SELECT offer_id FROM offer_info ORDER BY update_timestamp , offer_id DESC " +
+                "LIMIT #{page}, #{pagesize} ) t2 " +
             "ON t1.offer_id = t2.offer_id")
-        List<OfferDO> selectOfferInfo(int pagesize, int page);
+        List<OfferDO> selectOfferInfo(int page, int pagesize);
 
         @Select("SELECT * FROM offer_info WHERE offer_id = #{offer_id}")
         OfferInfo selectOfferInfoByOfferId(@Param("offer_id") String offer_id);

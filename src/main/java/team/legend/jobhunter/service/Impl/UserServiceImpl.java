@@ -257,12 +257,16 @@ public class UserServiceImpl implements UserService {
 //                        "NiKdYmYVoKlaRv85IfVunYzO0IKXsyl7JCUjCpoG20f0a04COwfne" +
 //                        "QAGGwd5oa+T8yO5hzuyDb/XcxxmK01EpqOyuxINew=="
 //        ,"r7BXXKkLb8qrSNn05n0qiA==");
-        JwtHelper<WXLogin> jwtHelper = new JwtHelper<>("HmacSHA256",1000,"lengend");
-        WXLogin wxLogin = new WXLogin("asd","asd","asd",
-                "asd","asd","qwe","qwe");
-        Jwt jwt = jwtHelper.createJwt(wxLogin);
-        System.out.println(jwt.getParameter("user_id"));
-
+//        JwtHelper<WXLogin> jwtHelper = new JwtHelper<>("HmacSHA256",1000,"lengend");
+//        WXLogin wxLogin = new WXLogin("asd","asd","asd",
+//                "asd","asd","qwe","qwe");
+//        Jwt jwt = jwtHelper.createJwt(wxLogin);
+//        System.out.println(jwt.getParameter("user_id"));
+        String rawData = "{\"nickName\":\"φ。\",\"gender\":1,\"language\":\"zh_CN\",\"city\":\"Shaoxing\",\"province\":\"Zhejiang\",\"country\":\"China\",\"avatarUrl\":\"https://wx.qlogo.cn/mmopen/vi_32/g9ddCibCmZc41HwL8QDuMQjtseRRqibj5vYScbRo7URoXgOypuwpPxzAKINhHyb406Z1Y7cYy1EnPhm9aMlUSqAQ/132\"}";
+        String sessionKey = "ys7L/wTHWcQlTkgBUiphfQ==";
+        String signature2 = SecretUtil.shaCheck(rawData,sessionKey);
+        System.out.println(signature2);
     }
+
 
 }

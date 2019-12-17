@@ -15,10 +15,10 @@ public interface OrderDao {
 
         int selectIsEffective(String orderId);
 
-        @Select("SELECT * FROM orders WHERE order_id = #{order_id}")
+        @Select("SELECT * FROM orders WHERE order_id = #{order_id} ")
         Order selectByOrderId(String order_id);
 
-        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND stu_id = #{stu_id}")
+        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND stu_id = #{stu_id} AND stu_confirm + tea_confirm <> 2 ")
         Order selectByTeaIdAndStuId(@Param("tea_id") String tea_id, @Param("stu_id") String stu_id);
 
 
@@ -92,7 +92,8 @@ public interface OrderDao {
         @Update("UPDATE orders SET order_status = 1 WHERE order_id = #{order_id}")
         int updateStatus(String order_id);
 
-        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND order_status = 0 ORDER BY appoint_timestamp LIMIT #{num}")
+        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND order_status = 0" +
+                "ORDER BY appoint_timestamp LIMIT 0 #{num}")
         List<Order> selectNowDayOrder(@Param("tea_id") String tea_id, @Param("num") int num);
 
 

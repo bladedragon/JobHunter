@@ -33,7 +33,7 @@ public class LoveController {
 
         log.info("stuId={}, offerId={}",stuId,offerId);
         int num = loveService.love(stuId,offerId);
-        if(num == 0){
+        if(num != 0 && num != 1){
             return  CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"Unknow Error");
         }
         data.put("isLove",num);
