@@ -67,6 +67,7 @@ public class OrderController {
             String requirement = jsonObject.getString("requirement");
             String realName = jsonObject.getString("realName");
             String tele = jsonObject.getString("tele");
+
             map = orderService.createOrder(teaId,stuId,null,order_type,price,discount,isonline,realName,tele,experience,requirement);
         }
         redisLockHelper.unlock(lock_id,lockTimestamp);

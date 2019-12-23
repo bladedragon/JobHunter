@@ -23,7 +23,7 @@ public class UploadController {
     OrderService orderService;
 
     @PostMapping(value = "/uploadFile",produces = "application/json;charset=UTF-8")
-    public String upload(@RequestParam String orderId,@RequestParam("fileName") String fileName,@RequestParam(value = "files") List<MultipartFile> files) throws UploadException {
+    public String upload(@RequestParam("orderId") String orderId,@RequestParam("fileName") String fileName,@RequestParam(value = "files") List<MultipartFile> files) throws UploadException {
 
         Map<String,Object> result = new HashMap<>();
 

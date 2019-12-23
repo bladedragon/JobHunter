@@ -49,10 +49,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = SqlErrorException.class)
     public Map<String, Object> createOrder(String tea_id,String stu_id,String service_id,String service_type,int price,
                                           int discount,int isonline,String realname,String tele,String experience,String requirement) throws OrderErrorException, SqlErrorException {
-            Map<String,Object> res_map = new HashMap<>(10);
 
-            Order order = orderDao.selectByTeaIdAndStuId(tea_id,stu_id);
-        System.out.println("order:"+order);
+
+        Map<String,Object> res_map = new HashMap<>(10);
+        String teaTele = "";
+        Order order = orderDao.selectByTeaIdAndStuId(tea_id,stu_id);
             if(order != null){
                 log.error(">>log :Order has exist");
                 res_map.put("repeat",null);
@@ -67,7 +68,8 @@ public class OrderServiceImpl implements OrderService {
                log.error(">>log: cannot get teaInfo :[{}]",tea_id);
                throw new SqlErrorException("teacher is null");
            }
-           System.out.println("order_id"+order_id);
+
+           teaTele = teacher.getTea_tele();
            int num = orderDao.insertOrder(new Order(order_id, tea_id, stu_id, discount, price, service_type, 1, isonline, requirement,
                    experience, tele, realname,teacher.getTea_nickname(),teacher.getTea_tele(),teacher.getTea_tag(),
            teacher.getTea_img_url(),teacher.getGender(),teacher.getTea_email(),teacher.getTea_description(),teacher.getTea_company(),
@@ -82,7 +84,6 @@ public class OrderServiceImpl implements OrderService {
 
            //如果有预订单，删除之
            String  preOrderId  = preOrderDao.selectPreOrderId(tea_id,stu_id);
-           System.out.println(preOrderId);
            if(null != preOrderId && !preOrderId.equals("")){
                preOrderDao.deletePreOrder(preOrderId);
                log.info(">>log :delete preOrder :[{}]",preOrderId);
@@ -97,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
        res_map.put("orderId",order.getOrder_id());
        res_map.put("teaId",order.getTea_id());
        res_map.put("stuId",order.getStu_id());
-       res_map.put("tele",order.getTele());
+       res_map.put("tele",teaTele);
        res_map.put("teaNickname",order.getTea_nickname());
 
        return res_map;
@@ -108,6 +109,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = SqlErrorException.class)
     public Map<String, Object> createOrder(String preOrderId) throws SqlErrorException {
 
+        String teaTele = "";
         Map<String ,Object> res_map = new HashMap<>(3);
 
         PreOrder preOrder = preOrderDao.selectAllByPreOrderId(preOrderId);
@@ -138,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
             //TODO: 完善价格逻辑，将填写价格和后台老师提供的价格进行匹配，如果价格不匹配器，订单无效
 
 
+            teaTele = teacher.getTea_tele();
             int num = orderDao.insertOrder(new Order(order_id, preOrder.getTea_id(), preOrder.getStu_id(), preOrder.getDiscount(), preOrder.getPrice(),
                     preOrder.getOrder_type(), 1, preOrder.getIsonline(), preOrder.getRequirement(), preOrder.getExperience(), preOrder.getTele(),
                     preOrder.getRealname(),teacher.getTea_nickname(),teacher.getTea_tele(),teacher.getTea_tag(),
@@ -154,6 +157,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
 
+            //删除待付款订单
             if(preOrderId != null || !preOrderId.equals("")){
                 preOrderDao.deletePreOrder(preOrderId);
                 log.info(">>log :delete preOrder :[{}]",preOrderId);
@@ -168,7 +172,7 @@ public class OrderServiceImpl implements OrderService {
         res_map.put("orderId",order.getOrder_id());
         res_map.put("teaId",order.getTea_id());
         res_map.put("stuId",order.getStu_id());
-        res_map.put("tele",order.getTele());
+        res_map.put("teaTele",teaTele);
         res_map.put("teaNickname",order.getTea_nickname());
         return res_map;
     }

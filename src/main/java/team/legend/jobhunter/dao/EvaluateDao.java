@@ -18,9 +18,9 @@ public interface EvaluateDao {
             "ON DUPLICATE KEY UPDATE content = #{content}")
     int insertFeedBack(String stu_id, @Param("content") String feedback, String tele, String create_date);
 
-    @Insert("INSERT INTO evaluate (stu_id,tea_id,order_id,comment,degree,create_date), " +
-            "VALUES(#{stu_id},#{tea_id},#{order_id},#{comment},#{degree}, #{create_date})")
-    int insertEvalaute(String stu_id,String tea_id,String order_id,String comment,Integer degree,String create_date);
+    @Insert("INSERT INTO evaluate (stu_id,tea_id,order_id, comments, degree, create_date) " +
+            "VALUES(#{stu_id}, #{tea_id}, #{order_id}, #{comments}, #{degree}, #{create_date})")
+    int insertEvalaute(String stu_id,String tea_id,String order_id,String comments,Integer degree,String create_date);
 
     @Select("SELECT * FROM evaluate WHERE tea_id = #{tea_id} ")
     List<EvaluateDO> selectEvaluateList(String tea_id);

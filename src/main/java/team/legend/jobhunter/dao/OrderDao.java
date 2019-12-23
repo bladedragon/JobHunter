@@ -92,8 +92,9 @@ public interface OrderDao {
         @Update("UPDATE orders SET order_status = 1 WHERE order_id = #{order_id}")
         int updateStatus(String order_id);
 
-        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND order_status = 0" +
-                "ORDER BY appoint_timestamp LIMIT 0 #{num}")
+        @Select("SELECT * FROM orders WHERE tea_id = #{tea_id} AND order_status = 0 " +
+                "AND appoint_timestamp <> 0 AND  appoint_location <> '' " +
+                "ORDER BY appoint_timestamp LIMIT #{num}")
         List<Order> selectNowDayOrder(@Param("tea_id") String tea_id, @Param("num") int num);
 
 

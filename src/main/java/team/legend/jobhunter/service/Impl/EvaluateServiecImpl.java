@@ -21,6 +21,7 @@ public class EvaluateServiecImpl implements EvaluateServiec {
 
         int num = evaluateDao.insertEvalaute(stu_id,tea_id,order_id,comment,degree,CommonUtil.getNowDate("yyyy-MM-dd HH:mm:ss"));
 
+
         if(num ==1){
             return 0;
         }else{

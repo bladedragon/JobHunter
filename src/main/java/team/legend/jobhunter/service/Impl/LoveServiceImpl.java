@@ -76,7 +76,10 @@ public class LoveServiceImpl implements LoveService {
 //            }else{
 //                date = "";
 //            }
-            map.put("offerId",offerInfo.getOffer_id());
+            if(offerInfo == null){
+                continue;
+            }
+            map.put("offerid",offerInfo.getOffer_id());
             map.put("offer",offerInfo.getOffer_name());
             map.put("company",offerInfo.getOffer_company_name());
             map.put("type",offerInfo.getOffer_type());

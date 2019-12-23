@@ -32,7 +32,7 @@ public class EvaluateController {
 
         int result = evaluateServiec.evaluate(stuId,teaId,orderId,commment,degree);
 
-        if(result == 1){
+        if(result == 0){
             return CommonUtil.returnFormat(200,"success",result);
         }else{
             return CommonUtil.returnFormatSimp(Constant.ERROR_CODE,"Unknow Error");

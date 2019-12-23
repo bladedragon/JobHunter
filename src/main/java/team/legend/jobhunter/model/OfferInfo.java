@@ -12,7 +12,7 @@ public class OfferInfo {
     private String offer_requirement;
     private String offer_location;
     private String offer_company_name;
-    private String offer_type;
+    private Integer offer_type;
     private String offer_description;
     private String offer_post_way;
     private String offer_salary;
